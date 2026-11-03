@@ -1,0 +1,26 @@
+# Render.com Blueprint for 1-Click Free Tier Deployment
+services:
+  - type: web
+    name: zerodrain-agent-trader
+    env: node
+    plan: free
+    region: oregon
+    buildCommand: npm install && npm run build:ui && cd apps/agent-core && npm install --omit=dev
+    startCommand: cd apps/agent-core && node server.js
+    healthCheckPath: /health
+    autoDeploy: true
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: NEAR_NETWORK_ID
+        value: testnet
+      - key: NEAR_NODE_URL
+        value: https://test.rpc.fastnear.com
+      - key: NEAR_RELAYER_ACCOUNT_ID
+        value: zerodrain-relayer-vault.testnet
+      - key: DEFUSE_API_URL
+        value: https://1click.chaindefuser.com
+      - key: NEAR_RELAYER_PRIVATE_KEY
+        sync: false

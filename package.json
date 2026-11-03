@@ -1,0 +1,25 @@
+{
+  "name": "zerodrain-agent-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "description": "ZeroDrain Production-Grade Autonomous Trading Monorepo for NEAR Protocol & Defuse Solver Network",
+  "workspaces": [
+    "apps/*"
+  ],
+  "scripts": {
+    "start:agent": "npm run start --workspace=@zerodrain/agent-core",
+    "dev:agent": "npm run dev --workspace=@zerodrain/agent-core",
+    "dev:ui": "npm run dev --workspace=@zerodrain/trader-ui",
+    "build:ui": "npm run build --workspace=@zerodrain/trader-ui",
+    "build": "npm run build:ui"
+  },
+  "keywords": [
+    "near-protocol",
+    "ai-agent",
+    "autonomous-trading",
+    "defuse-protocol",
+    "zero-mev",
+    "monorepo"
+  ],
+  "license": "MIT"
+}
