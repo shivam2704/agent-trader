@@ -49,7 +49,7 @@ export default function TradeHistory({ trades = [] }) {
             return (
               <tr key={t.id}>
                 <td>
-                  <div className="mono" style={{ fontSize: '0.69rem', color: 'var(--text-secondary)' }}>
+                  <div className="mono" style={{ fontSize: '0.69rem', color: 'var(--text-secondary)' }} title={t.timestamp ? new Date(t.timestamp).toLocaleString() : '--'}>
                     {t.timestamp ? new Date(t.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }) : '--'}
                   </div>
                   <div className="mono" style={{ fontSize: '0.61rem', color: 'var(--text-muted)' }}>

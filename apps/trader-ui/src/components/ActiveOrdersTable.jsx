@@ -62,6 +62,13 @@ export default function ActiveOrdersTable({ positions = [], currentPrice, onClos
     return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
   };
 
+  const fmtDate = (ts) => {
+    if (!ts) return '';
+    const d = new Date(ts);
+    if (isNaN(d.getTime())) return '';
+    return d.toLocaleDateString([], { month: 'short', day: 'numeric' });
+  };
+
   return (
     <div style={{ overflowX: 'auto', cursor: 'default', userSelect: 'none' }}>
       <table className="data-table">
@@ -99,9 +106,12 @@ export default function ActiveOrdersTable({ positions = [], currentPrice, onClos
                   </span>
                 </td>
                 <td>
-                  <span className="mono" style={{ fontSize: '0.69rem', color: 'var(--text-secondary)' }} title={openTime ? new Date(openTime).toLocaleString() : '--'}>
+                  <div className="mono" style={{ fontSize: '0.69rem', color: 'var(--text-secondary)' }} title={openTime ? new Date(openTime).toLocaleString() : '--'}>
                     {fmtTime(openTime)}
-                  </span>
+                  </div>
+                  <div className="mono" style={{ fontSize: '0.61rem', color: 'var(--text-muted)' }}>
+                    {fmtDate(openTime)}
+                  </div>
                 </td>
                 <td>
                   <span style={{ fontWeight: 600, color: 'var(--text-primary)' }}>

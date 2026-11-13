@@ -63,8 +63,12 @@ export default function AgentTerminal({ logs = [] }) {
                     </div>
                   )}
                 </div>
-                <span className="mono" style={{ fontSize: '0.63rem', color: 'var(--text-muted)', flexShrink: 0 }}>
-                  {new Date(log.timestamp).toLocaleTimeString()}
+                <span
+                  className="mono"
+                  style={{ fontSize: '0.63rem', color: 'var(--text-muted)', flexShrink: 0 }}
+                  title={log.timestamp ? new Date(log.timestamp).toLocaleString() : '--'}
+                >
+                  {log.timestamp ? new Date(log.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }) : '--'}
                 </span>
               </div>
             );
