@@ -35,6 +35,7 @@ const swaggerSpec = {
     { name: 'Agent Trading', description: 'Headless trade execution, order lifecycle, and exit endpoints' },
     { name: 'Market Data & Oracles', description: 'Live price tickers, 207+ supported tokens, and multi-timeframe candle charts' },
     { name: 'NEAR Intents (Defuse)', description: 'Zero-MEV 1-Click Solver quote generation and atomic execution' },
+    { name: 'NEAR Intents Agent API (v1)', description: 'Official NEAR Intents Agent API (docs.agentsonintents.com) compatible drop-in endpoints' },
     { name: 'Smart Contract Vault', description: 'On-chain deposit arming, circuit breaker settlements, and account stats' },
     { name: 'System & Health', description: 'Liveness probes, system metrics, and capability schemas' },
   ],
@@ -366,6 +367,42 @@ const swaggerSpec = {
         responses: {
           200: {
             description: 'Agent capability schema.',
+          },
+        },
+      },
+    },
+    '/v1/network': {
+      get: {
+        tags: ['NEAR Intents Agent API (v1)'],
+        summary: 'Agent API Network & RPC Dependency Probe',
+        description: 'Drop-in compatible alias for GET /v1/network matching official docs.agentsonintents.com specification.',
+        responses: {
+          200: {
+            description: 'Network and RPC dependency status.',
+          },
+        },
+      },
+    },
+    '/v1/tokens': {
+      get: {
+        tags: ['NEAR Intents Agent API (v1)'],
+        summary: 'Agent API Allowlisted Token Registry',
+        description: 'Drop-in compatible alias for GET /v1/tokens returning 207+ Defuse and NEAR ecosystem tokens with live USD rates.',
+        responses: {
+          200: {
+            description: 'Token registry with live rates.',
+          },
+        },
+      },
+    },
+    '/v1/status': {
+      get: {
+        tags: ['NEAR Intents Agent API (v1)'],
+        summary: 'Agent API Execution & Containment Status',
+        description: 'Drop-in compatible alias for GET /v1/status returning full agent brain state, active orders, and Stop-Loss circuit breaker state.',
+        responses: {
+          200: {
+            description: 'Active orders and containment state.',
           },
         },
       },

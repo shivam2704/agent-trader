@@ -44,6 +44,7 @@ const handleHealth = async (req, res) => {
 };
 app.get('/health', handleHealth);
 app.get('/api/health', handleHealth);
+app.get('/v1/network', handleHealth); // Official NEAR Intents Agent API compatibility alias
 
 // Interactive OpenAPI & Swagger 3.0 Documentation
 app.get(['/docs', '/api/docs'], (req, res) => {
@@ -62,7 +63,7 @@ app.get('/api/market/ticker', async (req, res) => {
 });
 
 // 2.1 All tokens supported on NEAR Protocol (Native, Cross-Chain, Stablecoins, Ecosystem)
-app.get('/api/market/tokens', (req, res) => {
+app.get(['/api/market/tokens', '/v1/tokens'], (req, res) => {
   res.json({
     success: true,
     tokens: marketEngine.getAllSupportedTokens(),
@@ -369,8 +370,8 @@ app.post('/api/agent/emergency-panic', async (req, res) => {
   });
 });
 
-// 9. Full Agent State
-app.get('/api/agent/state', (req, res) => {
+// 9. Full Agent State (Compatible with /v1/status in NEAR Intents Agent API)
+app.get(['/api/agent/state', '/v1/status'], (req, res) => {
   res.json(agentBrain.getFullState());
 });
 
