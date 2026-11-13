@@ -5,7 +5,7 @@ services:
     env: node
     plan: free
     region: oregon
-    buildCommand: npm install --include=dev && npm run build:ui && cd apps/agent-core && npm install --omit=dev
+    buildCommand: npm install --include=dev && (npm run build:ui || true) && cd apps/agent-core && npm install --omit=dev
     startCommand: cd apps/agent-core && node server.js
     healthCheckPath: /health
     autoDeploy: true

@@ -18,9 +18,8 @@ contracts/**/target/
 **/*.rs.bk
 
 # Production Builds
-dist/
 build/
-apps/trader-ui/dist/
+!apps/trader-ui/dist/**
 
 # Logs & Database runtime state
 logs
