@@ -248,7 +248,7 @@ class MarketEngine {
     else if (sym === 'ETH' || sym === 'WETH') krakenPair = 'ETHUSD';
     else if (sym === 'DOGE') krakenPair = 'XDGUSD';
     else if (sym === 'XRP') krakenPair = 'XRPUSD';
-    else if (sym === 'NEAR' || sym === 'WNEAR') krakenPair = 'NEARUSD';
+    else if (sym === 'NEAR' || sym === 'WNEAR' || sym === 'WRAP') krakenPair = 'NEARUSD';
     else if (sym === 'SOL') krakenPair = 'SOLUSD';
 
     try {

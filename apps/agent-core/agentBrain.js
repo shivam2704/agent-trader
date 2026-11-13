@@ -471,13 +471,26 @@ class AgentBrain {
     const sym = (tokenSym || '').toUpperCase();
     const cleanContract = (tokenContract || '').toLowerCase();
 
+    // 1. NEAR / Wrapped NEAR native mapping
+    if (sym === 'NEAR' || sym === 'WNEAR' || sym === 'WRAP' || cleanContract.includes('wrap')) {
+      return marketEngine.tokenStats['NEAR']?.price || marketEngine.tokenStats['WNEAR']?.price || (marketEngine.symbol === 'NEAR' ? marketEngine.getMarketState().price : 3.54);
+    }
+
+    // 2. Cross-chain top assets explicit mapping
+    if (sym === 'WBTC' || sym === 'BTC' || cleanContract.includes('wbtc') || cleanContract.includes('btc')) {
+      return marketEngine.tokenStats['WBTC']?.price || marketEngine.tokenStats['BTC']?.price || 68950;
+    }
+    if (sym === 'WETH' || sym === 'ETH' || cleanContract.includes('weth') || cleanContract.includes('eth')) {
+      return marketEngine.tokenStats['WETH']?.price || marketEngine.tokenStats['ETH']?.price || 1950;
+    }
+    if (sym === 'SOL' || cleanContract.includes('sol')) {
+      return marketEngine.tokenStats['SOL']?.price || 80.35;
+    }
+    if (sym === 'DOGE' || cleanContract.includes('doge')) return marketEngine.tokenStats['DOGE']?.price || 0.082;
+    if (sym === 'XRP' || cleanContract.includes('xrp')) return marketEngine.tokenStats['XRP']?.price || 1.32;
+    if (sym === 'USDC' || sym === 'USDT' || cleanContract.includes('usdc') || cleanContract.includes('usdt')) return 1.00;
+
     if (marketEngine.tokenStats[sym]?.price) return marketEngine.tokenStats[sym].price;
-    if (sym === 'WBTC' || sym === 'BTC') return marketEngine.tokenStats['BTC']?.price || 80800;
-    if (sym === 'WETH' || sym === 'ETH') return marketEngine.tokenStats['ETH']?.price || 2350;
-    if (sym === 'SOL') return marketEngine.tokenStats['SOL']?.price || 102.5;
-    if (sym === 'DOGE') return marketEngine.tokenStats['DOGE']?.price || 0.082;
-    if (sym === 'XRP') return marketEngine.tokenStats['XRP']?.price || 1.32;
-    if (sym === 'USDC' || sym === 'USDT') return 1.00;
 
     for (const t of marketEngine.supportedTokens || []) {
       if (
