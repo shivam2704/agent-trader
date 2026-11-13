@@ -1,0 +1,18 @@
+name: Keep Render App Alive (24/7)
+
+on:
+  schedule:
+    # Runs every 10 minutes (Render sleeps after 15 min of inactivity)
+    - cron: '*/10 * * * *'
+  workflow_dispatch: # Allows manual trigger from GitHub UI
+
+jobs:
+  ping-render:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send keep-alive health ping to Render
+        run: |
+          RENDER_URL="https://zerodrain-agent-trader.onrender.com/health"
+          echo "Pinging $RENDER_URL to prevent Render free-tier sleep..."
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$RENDER_URL" || echo "FAILED")
+          echo "Render Health Response Status: $STATUS"
