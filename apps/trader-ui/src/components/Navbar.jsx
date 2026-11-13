@@ -1,8 +1,8 @@
 // apps/trader-ui/src/components/Navbar.jsx
 import React, { useState } from 'react';
-import { Activity, Cpu, Check, Copy, ShieldCheck, ExternalLink, BookOpen, Radio } from 'lucide-react';
+import { Activity, Cpu, Check, Copy, ShieldCheck, ExternalLink, BookOpen, Radio, Sun, Moon } from 'lucide-react';
 
-export default function Navbar({ marketPrice, marketSymbol, agentStatus, targetWallet, feeStats }) {
+export default function Navbar({ marketPrice, marketSymbol, agentStatus, targetWallet, feeStats, theme, onToggleTheme }) {
   const [copied, setCopied] = useState(false);
 
   const isActive = agentStatus === 'SCANNING' || agentStatus === 'IN_POSITION';
@@ -137,6 +137,16 @@ export default function Navbar({ marketPrice, marketSymbol, agentStatus, targetW
         >
           {copied ? <Check size={13} /> : <Copy size={13} />}
           {copied ? 'Copied!' : 'cURL'}
+        </button>
+
+        {/* Dark / Light theme toggle */}
+        <button
+          onClick={onToggleTheme}
+          className="theme-toggle"
+          title={theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+        >
+          {theme === 'dark' ? <Sun size={13} /> : <Moon size={13} />}
+          {theme === 'dark' ? 'Light' : 'Dark'}
         </button>
       </div>
     </header>

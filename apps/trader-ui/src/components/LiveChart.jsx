@@ -822,18 +822,9 @@ export default function LiveChart({ marketData, onSelectToken }) {
         >
           <defs>
             <linearGradient id="areaGlowGradient" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#00f0ff" stopOpacity="0.35" />
-              <stop offset="60%" stopColor="#00f0ff" stopOpacity="0.08" />
-              <stop offset="100%" stopColor="#00f0ff" stopOpacity="0.0" />
+              <stop offset="0%" stopColor="#38bdf8" stopOpacity="0.22" />
+              <stop offset="100%" stopColor="#38bdf8" stopOpacity="0.0" />
             </linearGradient>
-
-            <filter id="neonBloom" x="-20%" y="-20%" width="140%" height="140%">
-              <feGaussianBlur stdDeviation="2.5" result="blur" />
-              <feMerge>
-                <feMergeNode in="blur" />
-                <feMergeNode in="SourceGraphic" />
-              </feMerge>
-            </filter>
           </defs>
 
           {/* Y-Axis Horizontal Gridlines & Price Scale */}
@@ -900,11 +891,10 @@ export default function LiveChart({ marketData, onSelectToken }) {
               />
               <polyline
                 fill="none"
-                stroke="#00f0ff"
-                strokeWidth="2.8"
+                stroke="#38bdf8"
+                strokeWidth="1.8"
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                filter="url(#neonBloom)"
                 points={polylinePoints}
               />
             </>
@@ -952,10 +942,10 @@ export default function LiveChart({ marketData, onSelectToken }) {
             y1={currentPriceY}
             x2={chartWidth}
             y2={currentPriceY}
-            stroke="#00f0ff"
-            strokeWidth="1.2"
-            strokeDasharray="4 4"
-            opacity="0.5"
+            stroke="#38bdf8"
+            strokeWidth="1"
+            strokeDasharray="3 3"
+            opacity="0.6"
           />
 
           {/* Right Y-Axis Permanent Live Price Badge */}
@@ -964,14 +954,14 @@ export default function LiveChart({ marketData, onSelectToken }) {
             y={Math.max(2, Math.min(chartHeight - 18, currentPriceY - 10))}
             width={yAxisWidth - 4}
             height="20"
-            rx="4"
-            fill="linear-gradient(135deg, #00f0ff 0%, #00a8ff 100%)"
+            rx="3"
+            fill="#0284c7"
           />
           <text
             x={chartWidth + yAxisWidth / 2}
             y={Math.max(2, Math.min(chartHeight - 18, currentPriceY - 10)) + 14}
             textAnchor="middle"
-            fill="#07090e"
+            fill="#ffffff"
             fontSize="9.5"
             fontFamily="JetBrains Mono, monospace"
             fontWeight="900"

@@ -1,103 +1,69 @@
-// frontend/src/components/AgentTerminal.jsx
+// apps/trader-ui/src/components/AgentTerminal.jsx
 import React, { useRef, useEffect } from 'react';
-import { Terminal, ExternalLink, ShieldCheck } from 'lucide-react';
+import { Terminal, ExternalLink } from 'lucide-react';
 
 export default function AgentTerminal({ logs = [] }) {
   const terminalEndRef = useRef(null);
 
   useEffect(() => {
-    // Auto scroll to latest if needed
+    terminalEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [logs]);
 
+  const levelMeta = (level) => {
+    switch (level) {
+      case 'EMERGENCY': return { color: 'var(--accent-red)', bg: 'rgba(239,68,68,0.12)' };
+      case 'TRADE':     return { color: 'var(--accent-green)', bg: 'rgba(16,185,129,0.12)' };
+      case 'WARNING':   return { color: 'var(--accent-amber)', bg: 'rgba(245,158,11,0.12)' };
+      default:          return { color: 'var(--accent-blue)', bg: 'rgba(59,130,246,0.1)' };
+    }
+  };
+
   return (
-    <div className="glass-panel" style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: '12px', height: '320px' }}>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid var(--border-subtle)', paddingBottom: '10px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <Terminal size={18} color="var(--accent-cyan)" />
-          <h3 style={{ fontSize: '0.9rem', fontWeight: 700 }}>Autonomous Agent Reasoning Stream</h3>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', height: '100%' }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingBottom: '10px', borderBottom: '1px solid var(--border-subtle)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '7px' }}>
+          <Terminal size={14} color="var(--text-muted)" />
+          <span style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-secondary)', letterSpacing: '0.03em' }}>EXECUTION & SOLVER AUDIT TRAIL</span>
         </div>
-        <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>Real-Time Testnet Loop</span>
+        <span style={{ fontSize: '0.65rem', color: 'var(--text-muted)' }}>{logs.length} events</span>
       </div>
 
-      <div style={{ flex: 1, overflowY: 'auto', background: 'rgba(0,0,0,0.35)', borderRadius: '8px', padding: '12px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+      <div style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '3px', minHeight: 0 }}>
         {logs.length === 0 ? (
-          <div style={{ color: 'var(--text-muted)', fontSize: '0.75rem', fontStyle: 'italic', margin: 'auto' }}>
-            Awaiting agent startup signal...
+          <div style={{ color: 'var(--text-muted)', fontSize: '0.75rem', margin: 'auto', textAlign: 'center' }}>
+            No activity. Awaiting engine startup signal.
           </div>
         ) : (
           logs.map((log) => {
-            const isEmergency = log.level === 'EMERGENCY';
-            const isTrade = log.level === 'TRADE';
-            const isWarn = log.level === 'WARNING';
-
-            const badgeColor = isEmergency
-              ? 'var(--accent-red)'
-              : isTrade
-              ? 'var(--accent-green)'
-              : isWarn
-              ? 'var(--accent-amber)'
-              : 'var(--accent-cyan)';
-
-            const badgeBg = isEmergency
-              ? 'rgba(255,51,102,0.15)'
-              : isTrade
-              ? 'rgba(0,255,136,0.15)'
-              : 'rgba(0,240,255,0.12)';
-
+            const { color, bg } = levelMeta(log.level);
             return (
               <div
                 key={log.id}
                 style={{
-                  fontSize: '0.75rem',
-                  lineHeight: '1.4',
                   display: 'flex',
                   alignItems: 'flex-start',
                   gap: '8px',
-                  padding: '6px 8px',
-                  borderRadius: '6px',
-                  background: isEmergency ? 'rgba(255,51,102,0.06)' : 'rgba(255,255,255,0.02)',
-                  border: isEmergency ? '1px solid rgba(255,51,102,0.3)' : 'none',
+                  padding: '5px 8px',
+                  borderRadius: '5px',
+                  background: log.level === 'EMERGENCY' ? 'rgba(239,68,68,0.05)' : 'transparent',
+                  border: log.level === 'EMERGENCY' ? '1px solid rgba(239,68,68,0.2)' : '1px solid transparent',
                 }}
               >
-                <span
-                  style={{
-                    fontSize: '0.65rem',
-                    fontWeight: 700,
-                    padding: '1px 6px',
-                    borderRadius: '4px',
-                    background: badgeBg,
-                    color: badgeColor,
-                    flexShrink: 0,
-                    marginTop: '1px',
-                  }}
-                >
+                <span style={{ fontSize: '0.6rem', fontWeight: 700, padding: '2px 6px', borderRadius: '3px', background: bg, color, flexShrink: 0, marginTop: '1px', letterSpacing: '0.04em' }}>
                   {log.level}
                 </span>
-
-                <div style={{ flex: 1 }}>
-                  <span style={{ color: 'var(--text-secondary)' }}>{log.message}</span>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <span style={{ fontSize: '0.73rem', color: 'var(--text-secondary)', wordBreak: 'break-word' }}>{log.message}</span>
                   {log.details?.explorerUrl && (
-                    <div style={{ marginTop: '4px' }}>
-                      <a
-                        href={log.details.explorerUrl}
-                        target="_blank"
-                        rel="noreferrer"
-                        style={{
-                          fontSize: '0.7rem',
-                          color: 'var(--accent-cyan)',
-                          display: 'inline-flex',
-                          alignItems: 'center',
-                          gap: '3px',
-                          textDecoration: 'none',
-                        }}
-                      >
-                        Nearblocks Explorer Proof <ExternalLink size={10} />
+                    <div style={{ marginTop: '3px' }}>
+                      <a href={log.details.explorerUrl} target="_blank" rel="noreferrer"
+                        style={{ fontSize: '0.68rem', color: 'var(--accent-blue)', display: 'inline-flex', alignItems: 'center', gap: '3px', textDecoration: 'none' }}>
+                        On-chain proof <ExternalLink size={9} />
                       </a>
                     </div>
                   )}
                 </div>
-
-                <span style={{ fontSize: '0.65rem', color: 'var(--text-muted)', flexShrink: 0 }} className="mono">
+                <span className="mono" style={{ fontSize: '0.63rem', color: 'var(--text-muted)', flexShrink: 0 }}>
                   {new Date(log.timestamp).toLocaleTimeString()}
                 </span>
               </div>

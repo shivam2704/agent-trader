@@ -95,3 +95,4 @@ export default function BottomTabs({ positions, currentPrice, trades, logs, onCl
     </div>
   );
 }
+

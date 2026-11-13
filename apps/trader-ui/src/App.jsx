@@ -8,6 +8,17 @@ import OrderBook from './components/OrderBook';
 import BottomTabs from './components/BottomTabs';
 
 export default function App() {
+  const [theme, setTheme] = useState(() => localStorage.getItem('zd_theme') || 'dark');
+
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem('zd_theme', theme);
+  }, [theme]);
+
+  const toggleTheme = () => {
+    setTheme((prev) => (prev === 'dark' ? 'light' : 'dark'));
+  };
+
   const [state, setState] = useState({
     status: 'IDLE',
     config: {
@@ -175,6 +186,8 @@ export default function App() {
         agentStatus={state.status}
         targetWallet={targetWallet}
         feeStats={state.feeStats}
+        theme={theme}
+        onToggleTheme={toggleTheme}
       />
 
       {/* ── Main grid ── */}

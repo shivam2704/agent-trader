@@ -154,3 +154,4 @@ export default function ActiveOrdersTable({ positions = [], currentPrice, onClos
     </div>
   );
 }
+

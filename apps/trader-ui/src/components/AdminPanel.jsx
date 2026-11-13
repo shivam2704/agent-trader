@@ -134,14 +134,14 @@ export default function AdminPanel({
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid var(--border-subtle)', paddingBottom: '14px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-          <Bot size={22} color="var(--accent-cyan)" />
+          <Cpu size={20} color="var(--accent-blue)" />
           <div>
-            <h2 style={{ fontSize: '1.05rem', fontWeight: 800 }}>Agent API Gateway</h2>
-            <span style={{ fontSize: '0.68rem', color: 'var(--text-muted)' }}>POST /api/agent/trade</span>
+            <h2 style={{ fontSize: '0.98rem', fontWeight: 700, color: 'var(--text-primary)' }}>Programmatic Intent Gateway</h2>
+            <span style={{ fontSize: '0.68rem', color: 'var(--text-muted)' }} className="mono">POST /api/agent/trade</span>
           </div>
         </div>
-        <span style={{ fontSize: '0.65rem', background: 'rgba(0,240,255,0.12)', color: '#00f0ff', padding: '3px 8px', borderRadius: '4px', fontWeight: 700 }}>
-          HEADLESS SERVICE
+        <span style={{ fontSize: '0.63rem', background: 'var(--accent-blue-dim)', color: 'var(--accent-blue)', padding: '2px 8px', borderRadius: '4px', fontWeight: 700, letterSpacing: '0.04em' }}>
+          INTENTS v1.2
         </span>
       </div>
 
@@ -585,23 +585,24 @@ export default function AdminPanel({
             disabled={isSubmitting}
             style={{
               width: '100%',
-              padding: '12px',
-              borderRadius: '10px',
-              border: 'none',
-              background: 'linear-gradient(135deg, #00f0ff 0%, #00ff88 100%)',
-              color: '#07090e',
-              fontWeight: 900,
-              fontSize: '0.9rem',
+              padding: '11px',
+              borderRadius: '7px',
+              border: '1px solid rgba(255,255,255,0.12)',
+              background: 'var(--accent-blue)',
+              color: '#ffffff',
+              fontWeight: 700,
+              fontSize: '0.85rem',
               cursor: isSubmitting ? 'not-allowed' : 'pointer',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               gap: '8px',
-              boxShadow: '0 0 20px rgba(0, 240, 255, 0.3)',
+              transition: 'opacity 0.15s',
+              opacity: isSubmitting ? 0.7 : 1,
             }}
           >
-            {isSubmitting ? <Loader2 size={16} className="spin" /> : <Play size={16} fill="#07090e" />}
-            ⚡ Dispatch Agent Payload (POST /api/agent/trade)
+            {isSubmitting ? <Loader2 size={15} className="spin" /> : <Play size={14} fill="#ffffff" />}
+            Dispatch Execution Intent (POST /api/agent/trade)
           </button>
 
           {isInPosition && (
@@ -611,13 +612,13 @@ export default function AdminPanel({
               disabled={isSubmitting}
               style={{
                 width: '100%',
-                padding: '10px',
-                borderRadius: '8px',
-                border: '1px solid rgba(255,51,102,0.4)',
-                background: 'rgba(255,51,102,0.15)',
+                padding: '9px',
+                borderRadius: '7px',
+                border: '1px solid var(--accent-red)',
+                background: 'var(--accent-red-dim)',
                 color: 'var(--accent-red)',
-                fontWeight: 800,
-                fontSize: '0.85rem',
+                fontWeight: 700,
+                fontSize: '0.8rem',
                 cursor: isSubmitting ? 'not-allowed' : 'pointer',
                 display: 'flex',
                 alignItems: 'center',
@@ -625,8 +626,8 @@ export default function AdminPanel({
                 gap: '8px',
               }}
             >
-              <Square size={14} fill="var(--accent-red)" />
-              🛑 Close Position & Return Funds (POST /api/agent/exit)
+              <Square size={13} fill="var(--accent-red)" />
+              Close Position & Return Funds (POST /api/agent/exit)
             </button>
           )}
         </div>
