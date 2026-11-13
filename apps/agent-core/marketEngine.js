@@ -221,17 +221,22 @@ class MarketEngine {
     const lower = tokenInput.toLowerCase().trim();
     let matchedSymbol = 'NEAR';
 
-    for (const t of this.supportedTokens) {
-      if (
-        lower === t.symbol.toLowerCase() ||
-        lower === (t.displaySymbol || '').toLowerCase() ||
-        lower === (t.contractId || '').toLowerCase() ||
-        lower === (t.assetId || '').toLowerCase() ||
-        lower === (t.testnetContract || '').toLowerCase() ||
-        lower === (t.name || '').toLowerCase()
-      ) {
-        matchedSymbol = t.symbol;
-        break;
+    if (lower === 'near' || lower === 'wnear' || lower === 'wrap' || lower === 'wrap.near' || lower === 'wrap.testnet') {
+      matchedSymbol = 'NEAR';
+    } else {
+      for (const t of this.supportedTokens) {
+        if (t.symbol && t.symbol.includes('DEPRECATED')) continue;
+        if (
+          lower === t.symbol.toLowerCase() ||
+          lower === (t.displaySymbol || '').toLowerCase() ||
+          lower === (t.contractId || '').toLowerCase() ||
+          lower === (t.assetId || '').toLowerCase() ||
+          lower === (t.testnetContract || '').toLowerCase() ||
+          lower === (t.name || '').toLowerCase()
+        ) {
+          matchedSymbol = t.symbol;
+          break;
+        }
       }
     }
 
@@ -248,7 +253,7 @@ class MarketEngine {
     else if (sym === 'ETH' || sym === 'WETH') krakenPair = 'ETHUSD';
     else if (sym === 'DOGE') krakenPair = 'XDGUSD';
     else if (sym === 'XRP') krakenPair = 'XRPUSD';
-    else if (sym === 'NEAR' || sym === 'WNEAR' || sym === 'WRAP') krakenPair = 'NEARUSD';
+    else if (sym.includes('NEAR') || sym === 'WRAP') krakenPair = 'NEARUSD';
     else if (sym === 'SOL') krakenPair = 'SOLUSD';
 
     try {
