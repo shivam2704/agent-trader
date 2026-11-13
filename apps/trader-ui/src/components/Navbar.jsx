@@ -37,109 +37,115 @@ export default function Navbar({ marketPrice, marketSymbol, agentStatus, targetW
     <header
       style={{
         margin: '12px 16px',
-        padding: '10px 20px',
+        padding: '8px 16px',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
         flexWrap: 'wrap',
         gap: '12px',
-        background: 'rgba(13,17,23,0.95)',
+        background: 'var(--bg-card)',
         border: '1px solid var(--border-subtle)',
-        borderRadius: '10px',
+        borderRadius: '8px',
       }}
     >
-      {/* Brand */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-        <div style={{ width: '34px', height: '34px', borderRadius: '8px', background: '#1e293b', border: '1px solid var(--border-mid)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <Cpu size={18} color="var(--accent-blue)" strokeWidth={2} />
+      {/* ── LEFT CLUSTER: Brand + Live Market Ticker + Status ── */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '14px', flexWrap: 'wrap' }}>
+        {/* Brand */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '9px' }}>
+          <div style={{ width: '28px', height: '28px', borderRadius: '6px', background: 'var(--bg-input)', border: '1px solid var(--border-mid)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <Cpu size={16} color="var(--accent-blue)" strokeWidth={2} />
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <span style={{ fontSize: '0.92rem', fontWeight: 700, letterSpacing: '-0.01em', color: 'var(--text-primary)' }}>
+              ZeroDrain<span style={{ color: 'var(--accent-blue)' }}>.AI</span>
+            </span>
+            <span style={{ fontSize: '0.6rem', padding: '1px 5px', borderRadius: '3px', background: 'var(--border-subtle)', color: 'var(--text-muted)', fontWeight: 600 }}>
+              TESTNET
+            </span>
+          </div>
         </div>
-        <div>
-          <h1 style={{ fontSize: '1rem', fontWeight: 700, letterSpacing: '-0.01em', color: 'var(--text-primary)' }}>
-            ZeroDrain <span style={{ color: 'var(--accent-blue)' }}>AI</span>
-          </h1>
-          <p style={{ fontSize: '0.62rem', color: 'var(--text-muted)', letterSpacing: '0.02em' }}>
-            Programmatic Trading · NEAR Protocol
-          </p>
-        </div>
-      </div>
 
-      {/* Center — price + status */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
-        {/* Spot price */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '7px', padding: '5px 12px', borderRadius: '7px', background: 'rgba(255,255,255,0.03)', border: '1px solid var(--border-subtle)' }}>
-          <Activity size={13} color="var(--accent-cyan)" />
-          <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>{marketSymbol || 'NEAR'}/USD</span>
-          <span className="mono" style={{ fontSize: '0.88rem', fontWeight: 700, color: 'var(--text-primary)' }}>
+        {/* Divider */}
+        <div style={{ width: '1px', height: '18px', background: 'var(--border-subtle)' }} />
+
+        {/* Live Market Spot Ticker */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '7px', padding: '4px 10px', borderRadius: '6px', background: 'var(--bg-input)', border: '1px solid var(--border-subtle)' }}>
+          <Activity size={13} color="var(--accent-blue)" />
+          <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)', fontWeight: 600 }}>{marketSymbol || 'NEAR'}/USD</span>
+          <span className="mono" style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--text-primary)' }}>
             {fmtPrice(marketPrice)}
           </span>
         </div>
 
-        {/* Agent status */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '5px 12px', borderRadius: '7px', background: 'rgba(255,255,255,0.03)', border: '1px solid var(--border-subtle)' }}>
+        {/* Operational Status */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '4px 9px', borderRadius: '6px', background: 'var(--bg-input)', border: '1px solid var(--border-subtle)' }}>
           {isActive || isHalted ? (
             <div className={isHalted ? 'pulse-dot-red' : 'pulse-dot'} />
           ) : (
-            <div style={{ width: '7px', height: '7px', borderRadius: '50%', background: 'var(--text-muted)' }} />
+            <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: 'var(--text-muted)' }} />
           )}
-          <span style={{ fontSize: '0.72rem', fontWeight: 600, color: statusColor, letterSpacing: '0.03em' }}>
+          <span style={{ fontSize: '0.68rem', fontWeight: 600, color: statusColor, letterSpacing: '0.04em' }}>
             {statusLabel}
           </span>
         </div>
+      </div>
 
-        {/* Fees */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '5px 12px', borderRadius: '7px', background: 'rgba(255,255,255,0.03)', border: '1px solid var(--border-subtle)' }} title="Total protocol fees paid (gas + 0.15%)">
-          <span style={{ fontSize: '0.78rem' }}>⛽</span>
-          <span className="mono" style={{ fontSize: '0.78rem', color: 'var(--accent-amber)', fontWeight: 600 }}>
+      {/* ── RIGHT CLUSTER: Metrics + Actions + Docs + Theme ── */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+        {/* Cumulative Protocol Gas Fees */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '4px 10px', borderRadius: '6px', background: 'var(--bg-input)', border: '1px solid var(--border-subtle)' }} title="Cumulative Gas + Protocol Execution Fees">
+          <span style={{ fontSize: '0.72rem' }}>⛽</span>
+          <span className="mono" style={{ fontSize: '0.75rem', color: 'var(--accent-amber)', fontWeight: 600 }}>
             {feeStats?.totalFeesPaidNear?.toFixed(4) || '0.0000'} Ⓝ
           </span>
         </div>
 
-        {/* Return wallet (truncated) */}
+        {/* Active Return Wallet (if present) */}
         {targetWallet && (
-          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '5px 12px', borderRadius: '7px', background: 'rgba(255,255,255,0.03)', border: '1px solid var(--border-subtle)' }}>
-            <Radio size={12} color="var(--accent-green)" />
-            <span className="mono" style={{ fontSize: '0.72rem', color: 'var(--accent-green)' }}>
-              {targetWallet.length > 20 ? targetWallet.slice(0, 18) + '…' : targetWallet}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '4px 10px', borderRadius: '6px', background: 'var(--accent-green-dim)', border: '1px solid var(--accent-green)' }}>
+            <Radio size={11} color="var(--accent-green)" />
+            <span className="mono" style={{ fontSize: '0.7rem', color: 'var(--accent-green)', fontWeight: 600 }}>
+              {targetWallet.length > 18 ? targetWallet.slice(0, 16) + '…' : targetWallet}
             </span>
           </div>
         )}
-      </div>
 
-      {/* Right — links */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-        {/* Smart contract */}
+        {/* Divider */}
+        <div style={{ width: '1px', height: '18px', background: 'var(--border-subtle)', margin: '0 2px' }} />
+
+        {/* Smart Contract Vault */}
         <a
           href="https://testnet.nearblocks.io/address/zerodrain-relayer-vault.testnet"
           target="_blank"
           rel="noopener noreferrer"
-          style={{ display: 'flex', alignItems: 'center', gap: '5px', padding: '5px 11px', borderRadius: '7px', border: '1px solid var(--border-subtle)', background: 'transparent', color: 'var(--text-secondary)', fontSize: '0.72rem', fontWeight: 600, textDecoration: 'none', transition: 'all 0.15s' }}
+          style={{ display: 'flex', alignItems: 'center', gap: '5px', padding: '5px 10px', borderRadius: '6px', border: '1px solid var(--border-subtle)', background: 'transparent', color: 'var(--text-secondary)', fontSize: '0.72rem', fontWeight: 600, textDecoration: 'none', transition: 'all 0.15s' }}
         >
           <ShieldCheck size={13} />
           Contract
           <ExternalLink size={10} />
         </a>
 
-        {/* Swagger */}
+        {/* Swagger / OpenAPI Docs */}
         <a
           href="/docs"
           target="_blank"
           rel="noopener noreferrer"
-          style={{ display: 'flex', alignItems: 'center', gap: '5px', padding: '5px 11px', borderRadius: '7px', border: '1px solid var(--border-subtle)', background: 'transparent', color: 'var(--text-secondary)', fontSize: '0.72rem', fontWeight: 600, textDecoration: 'none', transition: 'all 0.15s' }}
+          style={{ display: 'flex', alignItems: 'center', gap: '5px', padding: '5px 10px', borderRadius: '6px', border: '1px solid var(--border-subtle)', background: 'transparent', color: 'var(--text-secondary)', fontSize: '0.72rem', fontWeight: 600, textDecoration: 'none', transition: 'all 0.15s' }}
         >
           <BookOpen size={13} />
-          API Docs
+          Docs
         </a>
 
-        {/* cURL copy */}
+        {/* cURL Copy */}
         <button
           onClick={copyCurl}
-          style={{ display: 'flex', alignItems: 'center', gap: '5px', padding: '5px 11px', borderRadius: '7px', border: `1px solid ${copied ? 'var(--accent-green)' : 'var(--border-subtle)'}`, background: copied ? 'var(--accent-green-dim)' : 'transparent', color: copied ? 'var(--accent-green)' : 'var(--text-secondary)', fontSize: '0.72rem', fontWeight: 600, cursor: 'pointer', transition: 'all 0.15s', fontFamily: 'var(--font-main)' }}
+          style={{ display: 'flex', alignItems: 'center', gap: '5px', padding: '5px 10px', borderRadius: '6px', border: `1px solid ${copied ? 'var(--accent-green)' : 'var(--border-subtle)'}`, background: copied ? 'var(--accent-green-dim)' : 'transparent', color: copied ? 'var(--accent-green)' : 'var(--text-secondary)', fontSize: '0.72rem', fontWeight: 600, cursor: 'pointer', transition: 'all 0.15s', fontFamily: 'inherit' }}
         >
           {copied ? <Check size={13} /> : <Copy size={13} />}
-          {copied ? 'Copied!' : 'cURL'}
+          {copied ? 'Copied' : 'cURL'}
         </button>
 
-        {/* Dark / Light theme toggle */}
+        {/* Dark / Light Theme Toggle */}
         <button
           onClick={onToggleTheme}
           className="theme-toggle"
