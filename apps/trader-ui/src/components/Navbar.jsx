@@ -1,186 +1,142 @@
-// frontend/src/components/Navbar.jsx
+// apps/trader-ui/src/components/Navbar.jsx
 import React, { useState } from 'react';
-import { Activity, Cpu, Bot, Check, Copy, ArrowRightLeft, Radio, ShieldCheck, ExternalLink, BookOpen } from 'lucide-react';
+import { Activity, Cpu, Check, Copy, ShieldCheck, ExternalLink, BookOpen, Radio } from 'lucide-react';
 
-export default function Navbar({
-  marketPrice,
-  marketSymbol,
-  agentStatus,
-  targetWallet,
-  feeStats,
-}) {
+export default function Navbar({ marketPrice, marketSymbol, agentStatus, targetWallet, feeStats }) {
   const [copied, setCopied] = useState(false);
 
-  const isAgentActive = agentStatus === 'SCANNING' || agentStatus === 'IN_POSITION';
+  const isActive = agentStatus === 'SCANNING' || agentStatus === 'IN_POSITION';
   const isHalted = agentStatus === 'CIRCUIT_BREAKER_HALTED';
 
+  const statusColor = isHalted ? 'var(--accent-red)' : isActive ? 'var(--accent-green)' : 'var(--text-muted)';
+  const statusLabel = isHalted
+    ? 'CIRCUIT BREAKER'
+    : agentStatus === 'IN_POSITION'
+    ? 'IN POSITION'
+    : isActive
+    ? 'SCANNING'
+    : 'READY';
+
   const copyCurl = () => {
-    const curl = `curl -X POST http://localhost:4000/api/agent/trade \\
+    const curl = `curl -X POST https://zerodrain-agent-trader.onrender.com/api/agent/trade \\
   -H "Content-Type: application/json" \\
-  -d '{"sl": 5.0, "tp": 10.0, "token": "wrap.testnet", "amount": 3.0, "wallet": "client_agent_vault.testnet"}'`;
+  -d '{"sl":5.0,"tp":10.0,"token":"wrap.testnet","amount":3.0,"wallet":"client_agent_vault.testnet"}'`;
     navigator.clipboard.writeText(curl);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
 
+  const fmtPrice = (p) => {
+    if (!p) return '--';
+    return p >= 100
+      ? `$${p.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+      : `$${p.toFixed(4)}`;
+  };
+
   return (
-    <header className="glass-panel" style={{ margin: '16px 20px', padding: '14px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '16px' }}>
-      {/* Brand & Headless Agent API Tagline */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
-        <div style={{ width: '42px', height: '42px', borderRadius: '12px', background: 'linear-gradient(135deg, #00f0ff 0%, #7928ca 100%)', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 0 16px rgba(0,240,255,0.4)' }}>
-          <Cpu size={24} color="#000" strokeWidth={2.5} />
+    <header
+      style={{
+        margin: '12px 16px',
+        padding: '10px 20px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        flexWrap: 'wrap',
+        gap: '12px',
+        background: 'rgba(13,17,23,0.95)',
+        border: '1px solid var(--border-subtle)',
+        borderRadius: '10px',
+      }}
+    >
+      {/* Brand */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+        <div style={{ width: '34px', height: '34px', borderRadius: '8px', background: '#1e293b', border: '1px solid var(--border-mid)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <Cpu size={18} color="var(--accent-blue)" strokeWidth={2} />
         </div>
         <div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <h1 style={{ fontSize: '1.25rem', fontWeight: 800, letterSpacing: '-0.02em', background: 'linear-gradient(90deg, #ffffff 0%, #00f0ff 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
-              ZeroDrain AI
-            </h1>
-            <span style={{ fontSize: '0.65rem', textTransform: 'uppercase', padding: '2px 8px', borderRadius: '20px', background: 'rgba(0, 240, 255, 0.12)', color: '#00f0ff', border: '1px solid rgba(0, 240, 255, 0.3)', fontWeight: 800, letterSpacing: '0.05em' }}>
-              HEADLESS AGENT API
-            </span>
-          </div>
-          <p style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>
-            Programmatic Trading Execution Service for AI Agents • Return Settled Directly to Caller Wallet
+          <h1 style={{ fontSize: '1rem', fontWeight: 700, letterSpacing: '-0.01em', color: 'var(--text-primary)' }}>
+            ZeroDrain <span style={{ color: 'var(--accent-blue)' }}>AI</span>
+          </h1>
+          <p style={{ fontSize: '0.62rem', color: 'var(--text-muted)', letterSpacing: '0.02em' }}>
+            Programmatic Trading · NEAR Protocol
           </p>
         </div>
       </div>
 
-      {/* Live Market & Agent Status Center */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '14px', flexWrap: 'wrap' }}>
-        {/* Live Asset Spot Price */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', background: 'rgba(255,255,255,0.04)', padding: '6px 14px', borderRadius: '10px', border: '1px solid var(--border-subtle)' }}>
-          <Activity size={16} color="var(--accent-cyan)" />
-          <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>{marketSymbol || 'NEAR'}/USD Spot:</span>
-          <span className="mono" style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--text-primary)' }}>
-            {marketPrice ? `$${marketPrice >= 100 ? marketPrice.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : marketPrice.toFixed(4)}` : '--'}
+      {/* Center — price + status */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
+        {/* Spot price */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '7px', padding: '5px 12px', borderRadius: '7px', background: 'rgba(255,255,255,0.03)', border: '1px solid var(--border-subtle)' }}>
+          <Activity size={13} color="var(--accent-cyan)" />
+          <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>{marketSymbol || 'NEAR'}/USD</span>
+          <span className="mono" style={{ fontSize: '0.88rem', fontWeight: 700, color: 'var(--text-primary)' }}>
+            {fmtPrice(marketPrice)}
           </span>
         </div>
 
-        {/* Fees Paid Tracking Pill */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', background: 'rgba(255,170,0,0.06)', padding: '6px 14px', borderRadius: '10px', border: '1px solid rgba(255,170,0,0.3)' }} title="Cumulative Gas Burnt + 0.15% Protocol Execution Fee">
-          <span style={{ fontSize: '1rem' }}>⛽</span>
-          <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <span style={{ fontSize: '0.75rem', color: 'var(--accent-amber)', fontWeight: 600 }}>Fees Paid:</span>
-              <span className="mono" style={{ fontSize: '0.9rem', fontWeight: 800, color: '#fff' }}>
-                {feeStats?.totalFeesPaidNear !== undefined ? `${feeStats.totalFeesPaidNear.toFixed(4)} NEAR` : '0.0000 NEAR'}
-              </span>
-            </div>
-            <span style={{ fontSize: '0.62rem', color: 'var(--text-muted)', display: 'block' }}>
-              (0.15% Protocol + Gas)
-            </span>
-          </div>
-        </div>
-
-        {/* Agent Operational Status */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', background: isHalted ? 'rgba(255,51,102,0.12)' : isAgentActive ? 'rgba(0,255,136,0.1)' : 'rgba(255,255,255,0.04)', padding: '6px 14px', borderRadius: '10px', border: `1px solid ${isHalted ? 'rgba(255,51,102,0.4)' : isAgentActive ? 'rgba(0,255,136,0.3)' : 'var(--border-subtle)'}` }}>
-          <div className={isHalted ? 'pulse-dot-red' : isAgentActive ? 'pulse-dot' : ''} style={!isAgentActive && !isHalted ? { width: '8px', height: '8px', borderRadius: '50%', background: '#64748b' } : {}} />
-          <span style={{ fontSize: '0.8rem', fontWeight: 700, color: isHalted ? 'var(--accent-red)' : isAgentActive ? 'var(--accent-green)' : 'var(--text-secondary)' }}>
-            {isHalted ? 'CIRCUIT BREAKER HALTED' : isAgentActive ? (agentStatus === 'IN_POSITION' ? 'IN POSITION (PROTECTED)' : 'AGENT SCANNING 24/7') : 'API SERVICE READY'}
+        {/* Agent status */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '5px 12px', borderRadius: '7px', background: 'rgba(255,255,255,0.03)', border: '1px solid var(--border-subtle)' }}>
+          {isActive || isHalted ? (
+            <div className={isHalted ? 'pulse-dot-red' : 'pulse-dot'} />
+          ) : (
+            <div style={{ width: '7px', height: '7px', borderRadius: '50%', background: 'var(--text-muted)' }} />
+          )}
+          <span style={{ fontSize: '0.72rem', fontWeight: 600, color: statusColor, letterSpacing: '0.03em' }}>
+            {statusLabel}
           </span>
         </div>
 
-        {/* Target Caller Wallet / Return Destination */}
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '10px',
-            background: 'linear-gradient(135deg, rgba(13,18,28,0.95) 0%, rgba(20,29,48,0.95) 100%)',
-            padding: '6px 14px',
-            borderRadius: '10px',
-            border: '1px solid rgba(0,240,255,0.3)',
-          }}
-        >
-          <Bot size={18} color="var(--accent-cyan)" />
-          <div>
-            <span style={{ fontSize: '0.65rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.04em', display: 'flex', alignItems: 'center', gap: '4px' }}>
-              <ArrowRightLeft size={10} color="var(--accent-green)" /> Return Target Wallet
-            </span>
-            <div className="mono" style={{ fontSize: '0.8rem', fontWeight: 800, color: targetWallet ? '#00ff88' : 'var(--text-muted)' }}>
-              {targetWallet || 'Awaiting Agent Session...'}
-            </div>
-          </div>
+        {/* Fees */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '5px 12px', borderRadius: '7px', background: 'rgba(255,255,255,0.03)', border: '1px solid var(--border-subtle)' }} title="Total protocol fees paid (gas + 0.15%)">
+          <span style={{ fontSize: '0.78rem' }}>⛽</span>
+          <span className="mono" style={{ fontSize: '0.78rem', color: 'var(--accent-amber)', fontWeight: 600 }}>
+            {feeStats?.totalFeesPaidNear?.toFixed(4) || '0.0000'} Ⓝ
+          </span>
         </div>
 
-        {/* On-Chain Smart Contract Vault Pill */}
+        {/* Return wallet (truncated) */}
+        {targetWallet && (
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '5px 12px', borderRadius: '7px', background: 'rgba(255,255,255,0.03)', border: '1px solid var(--border-subtle)' }}>
+            <Radio size={12} color="var(--accent-green)" />
+            <span className="mono" style={{ fontSize: '0.72rem', color: 'var(--accent-green)' }}>
+              {targetWallet.length > 20 ? targetWallet.slice(0, 18) + '…' : targetWallet}
+            </span>
+          </div>
+        )}
+      </div>
+
+      {/* Right — links */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+        {/* Smart contract */}
         <a
           href="https://testnet.nearblocks.io/address/zerodrain-relayer-vault.testnet"
           target="_blank"
           rel="noopener noreferrer"
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px',
-            background: 'rgba(121, 40, 202, 0.12)',
-            padding: '6px 12px',
-            borderRadius: '10px',
-            border: '1px solid rgba(121, 40, 202, 0.35)',
-            textDecoration: 'none',
-            color: '#c084fc',
-            cursor: 'pointer',
-            transition: 'all 0.2s',
-          }}
-          title="Audited NEAR Protocol Smart Contract: Non-Custodial Vault & Circuit Breaker"
+          style={{ display: 'flex', alignItems: 'center', gap: '5px', padding: '5px 11px', borderRadius: '7px', border: '1px solid var(--border-subtle)', background: 'transparent', color: 'var(--text-secondary)', fontSize: '0.72rem', fontWeight: 600, textDecoration: 'none', transition: 'all 0.15s' }}
         >
-          <ShieldCheck size={16} color="#c084fc" />
-          <div>
-            <span style={{ fontSize: '0.62rem', color: '#e9d5ff', textTransform: 'uppercase', letterSpacing: '0.04em', display: 'flex', alignItems: 'center', gap: '4px' }}>
-              Smart Contract Vault <ExternalLink size={9} />
-            </span>
-            <span className="mono" style={{ fontSize: '0.75rem', fontWeight: 700, color: '#fff' }}>
-              zerodrain-relayer-vault.testnet
-            </span>
-          </div>
+          <ShieldCheck size={13} />
+          Contract
+          <ExternalLink size={10} />
         </a>
 
-        {/* Swagger OpenAPI Docs Link */}
+        {/* Swagger */}
         <a
           href="/docs"
           target="_blank"
           rel="noopener noreferrer"
-          title="Open Interactive Swagger / OpenAPI Documentation"
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '6px',
-            background: 'rgba(0, 240, 255, 0.12)',
-            border: '1px solid rgba(0, 240, 255, 0.35)',
-            color: '#00f0ff',
-            borderRadius: '8px',
-            padding: '7px 12px',
-            fontSize: '0.75rem',
-            fontWeight: 700,
-            textDecoration: 'none',
-            transition: 'all 0.15s',
-          }}
+          style={{ display: 'flex', alignItems: 'center', gap: '5px', padding: '5px 11px', borderRadius: '7px', border: '1px solid var(--border-subtle)', background: 'transparent', color: 'var(--text-secondary)', fontSize: '0.72rem', fontWeight: 600, textDecoration: 'none', transition: 'all 0.15s' }}
         >
-          <BookOpen size={14} />
-          Swagger Docs
+          <BookOpen size={13} />
+          API Docs
         </a>
 
-        {/* Copy cURL Quick Action */}
+        {/* cURL copy */}
         <button
-          type="button"
           onClick={copyCurl}
-          title="Copy Agent API cURL Payload"
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '6px',
-            background: copied ? 'rgba(0,255,136,0.2)' : 'rgba(255,255,255,0.06)',
-            border: `1px solid ${copied ? 'var(--accent-green)' : 'var(--border-subtle)'}`,
-            color: copied ? 'var(--accent-green)' : '#fff',
-            borderRadius: '8px',
-            padding: '7px 12px',
-            fontSize: '0.75rem',
-            fontWeight: 700,
-            cursor: 'pointer',
-            transition: 'all 0.15s',
-          }}
+          style={{ display: 'flex', alignItems: 'center', gap: '5px', padding: '5px 11px', borderRadius: '7px', border: `1px solid ${copied ? 'var(--accent-green)' : 'var(--border-subtle)'}`, background: copied ? 'var(--accent-green-dim)' : 'transparent', color: copied ? 'var(--accent-green)' : 'var(--text-secondary)', fontSize: '0.72rem', fontWeight: 600, cursor: 'pointer', transition: 'all 0.15s', fontFamily: 'var(--font-main)' }}
         >
-          {copied ? <Check size={14} /> : <Copy size={14} />}
-          {copied ? 'Copied cURL!' : 'API cURL'}
+          {copied ? <Check size={13} /> : <Copy size={13} />}
+          {copied ? 'Copied!' : 'cURL'}
         </button>
       </div>
     </header>

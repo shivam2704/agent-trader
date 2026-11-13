@@ -1,12 +1,11 @@
-// frontend/src/App.jsx
+// apps/trader-ui/src/App.jsx
 import React, { useState, useEffect } from 'react';
 import Navbar from './components/Navbar';
 import AdminPanel from './components/AdminPanel';
 import LiveChart from './components/LiveChart';
 import IndicatorGauges from './components/IndicatorGauges';
-import PositionCard from './components/PositionCard';
-import AgentTerminal from './components/AgentTerminal';
-import TradeHistory from './components/TradeHistory';
+import OrderBook from './components/OrderBook';
+import BottomTabs from './components/BottomTabs';
 
 export default function App() {
   const [state, setState] = useState({
@@ -20,13 +19,10 @@ export default function App() {
       takeProfitPercent: 10.0,
       tradingMode: 'TWO_WAY',
     },
-    position: {
-      inPosition: false,
-    },
-    feeStats: {
-      totalFeesPaidNear: 0,
-      totalFeesPaidUsd: 0,
-    },
+    position: { inPosition: false },
+    activePositions: [],
+    activePositionsCount: 0,
+    feeStats: { totalFeesPaidNear: 0, totalFeesPaidUsd: 0 },
     market: {
       price: null,
       symbol: 'NEAR',
@@ -41,7 +37,7 @@ export default function App() {
     recentLogs: [],
   });
 
-  // Connect WebSocket to backend stream (Dynamic for localhost & free cloud hosting)
+  // WebSocket connection with auto-reconnect
   useEffect(() => {
     let ws = null;
     let reconnectTimeout = null;
@@ -52,7 +48,7 @@ export default function App() {
 
       const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
       const customWsUrl = import.meta.env.VITE_WS_URL;
-      
+
       let wsUrl;
       if (customWsUrl) {
         wsUrl = customWsUrl;
@@ -66,7 +62,7 @@ export default function App() {
         ws = new WebSocket(wsUrl);
 
         ws.onopen = () => {
-          console.log(`✅ Connected to ZeroDrain WebSocket stream (${wsUrl})`);
+          console.log(`✅ ZeroDrain WS connected (${wsUrl})`);
         };
 
         ws.onmessage = (event) => {
@@ -76,45 +72,43 @@ export default function App() {
               setState(message.data);
             }
           } catch (e) {
-            console.error('Error parsing WS message:', e);
+            console.error('WS parse error:', e);
           }
         };
 
         ws.onclose = () => {
           if (!isUnmounted) {
-            console.log('🔌 WebSocket disconnected. Reconnecting in 3s...');
+            console.log('🔌 WS disconnected. Reconnecting in 3s...');
             reconnectTimeout = setTimeout(connectWS, 3000);
           }
         };
 
-        ws.onerror = (err) => {
-          console.warn('WebSocket stream error:', err);
+        ws.onerror = () => {
           if (ws) ws.close();
         };
       } catch (err) {
-        console.error('Failed to initialize WebSocket:', err);
-        if (!isUnmounted) {
-          reconnectTimeout = setTimeout(connectWS, 4000);
-        }
+        console.error('WS init failed:', err);
+        if (!isUnmounted) reconnectTimeout = setTimeout(connectWS, 4000);
       }
     };
 
     connectWS();
 
-    // Initial fetch via REST
+    // Initial REST fetch
     fetch('/api/agent/state')
-      .then((res) => res.json())
-      .then((data) => {
-        if (data) setState(data);
-      })
-      .catch((err) => console.log('Waiting for backend...', err));
+      .then((r) => r.json())
+      .then((data) => { if (data) setState(data); })
+      .catch(() => {});
 
     return () => {
+      isUnmounted = true;
+      clearTimeout(reconnectTimeout);
       if (ws) ws.close();
     };
   }, []);
 
-  // Dispatch an incoming Agent trade payload { sl, tp, token, amount, wallet }
+  // ── API handlers ──────────────────────────────────────────────
+
   const handleDispatchPayload = async (payload) => {
     try {
       const res = await fetch('/api/agent/trade', {
@@ -122,61 +116,59 @@ export default function App() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       });
-      const data = await res.json();
-      return data;
+      return await res.json();
     } catch (err) {
-      console.error('Error dispatching agent payload:', err);
       return { success: false, error: err.message };
     }
   };
 
-  // Close position and trigger on-chain return of funds to wallet
-  const handleCloseAndReturn = async (wallet, reason) => {
+  const handleCloseAndReturn = async (wallet, orderId, reason) => {
     try {
+      const body = { wallet, reason: reason || 'MANUAL_CLOSE_UI' };
+      if (orderId) body.orderId = orderId;
       const res = await fetch('/api/agent/exit', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ wallet, reason }),
+        body: JSON.stringify(body),
       });
-      const data = await res.json();
-      return data;
+      return await res.json();
     } catch (err) {
-      console.error('Error closing position:', err);
       return { success: false, error: err.message };
     }
   };
 
-  // Switch active token on NEAR chain
   const handleSwitchToken = async (tokenObj) => {
     try {
       const sym = typeof tokenObj === 'string' ? tokenObj : tokenObj.symbol;
       const contract = tokenObj.testnetContract || tokenObj.contractId || sym;
-
       const res = await fetch('/api/market/switch-token', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ symbol: sym, token: contract }),
       });
       const data = await res.json();
-
       setState((prev) => ({
         ...prev,
-        config: {
-          ...prev.config,
-          tokenPair: contract,
-        },
+        config: { ...prev.config, tokenPair: contract },
         market: data || prev.market,
       }));
     } catch (err) {
-      console.error('Failed to switch market token:', err);
+      console.error('Token switch failed:', err);
     }
   };
 
-  const targetWallet = state.position?.returnWallet || state.activeOrder?.wallet || state.config?.wallet || null;
+  const targetWallet =
+    state.position?.returnWallet ||
+    state.activeOrder?.wallet ||
+    state.config?.wallet ||
+    null;
+
+  const activePositions = state.activePositions || [];
 
   return (
-    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
-      {/* Top Navbar: Headless Agent API Status & Target Wallet */}
+    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', background: 'var(--bg-primary)' }}>
+
+      {/* ── Navbar ── */}
       <Navbar
         marketPrice={state.market?.price}
         marketSymbol={state.market?.symbol}
@@ -185,44 +177,49 @@ export default function App() {
         feeStats={state.feeStats}
       />
 
-      {/* Main Grid Layout */}
-      <main style={{ padding: '0 20px 40px 20px', maxWidth: '1440px', margin: '0 auto', width: '100%', boxSizing: 'border-box' }}>
-        <div style={{ display: 'grid', gridTemplateColumns: '390px minmax(0, 1fr)', gap: '24px', alignItems: 'start', width: '100%', maxWidth: '100%' }}>
-          {/* Left Column: Agent API Gateway & Live Payload Dispatcher */}
-          <AdminPanel
-            config={state.config}
-            agentStatus={state.status}
-            lastPayload={state.lastPayload}
-            onDispatchPayload={handleDispatchPayload}
-            onCloseAndReturn={handleCloseAndReturn}
-            onSelectToken={handleSwitchToken}
-          />
+      {/* ── Main grid ── */}
+      <main style={{ flex: 1, padding: '0 16px 32px', maxWidth: '1600px', margin: '0 auto', width: '100%', boxSizing: 'border-box' }}>
 
-          {/* Right Column: Live Chart, Indicators, Positions, Terminal & History (minWidth: 0 prevents blowout) */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', minWidth: 0, width: '100%', maxWidth: '100%' }}>
-            {/* Live Chart & Oracles with all NEAR tokens */}
-            <LiveChart marketData={state.market} onSelectToken={handleSwitchToken} />
+        {/* Top row: Left sidebar + Chart + Order Book */}
+        <div style={{ display: 'grid', gridTemplateColumns: '360px minmax(0,1fr) 260px', gap: '16px', alignItems: 'start' }}>
 
-            {/* Indicator Gauges & Position Status */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
-              <IndicatorGauges
-                indicators={state.market?.indicators}
-                signal={state.market?.signal}
-                reasoning={state.market?.reasoning}
-              />
-              <PositionCard
-                position={state.position}
-                config={state.config}
-                agentStatus={state.status}
-              />
-            </div>
-
-            {/* Live Agent Reasoning Terminal */}
-            <AgentTerminal logs={state.recentLogs} />
-
-            {/* Trade Settlement History with Return Destination Proof */}
-            <TradeHistory trades={state.tradeHistory} />
+          {/* Left — Agent API panel */}
+          <div>
+            <AdminPanel
+              config={state.config}
+              agentStatus={state.status}
+              lastPayload={state.lastPayload}
+              onDispatchPayload={handleDispatchPayload}
+              onCloseAndReturn={handleCloseAndReturn}
+              onSelectToken={handleSwitchToken}
+            />
           </div>
+
+          {/* Center — Chart + Indicators */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '14px', minWidth: 0 }}>
+            <LiveChart marketData={state.market} onSelectToken={handleSwitchToken} />
+            <IndicatorGauges
+              indicators={state.market?.indicators}
+              signal={state.market?.signal}
+              reasoning={state.market?.reasoning}
+            />
+          </div>
+
+          {/* Right — Order Book */}
+          <div style={{ height: '100%', minHeight: '480px' }}>
+            <OrderBook marketData={state.market} />
+          </div>
+        </div>
+
+        {/* Bottom — Unified tabs: Active Orders / History / Logs */}
+        <div style={{ marginTop: '16px' }}>
+          <BottomTabs
+            positions={activePositions}
+            currentPrice={state.market?.price}
+            trades={state.tradeHistory}
+            logs={state.recentLogs}
+            onClosePosition={handleCloseAndReturn}
+          />
         </div>
       </main>
     </div>
