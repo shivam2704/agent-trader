@@ -2,11 +2,12 @@
 import React, { useState } from 'react';
 import { X, TrendingUp, TrendingDown, Layers } from 'lucide-react';
 
-function PnlBadge({ entryPrice, currentPrice, size }) {
-  if (!entryPrice || !currentPrice) return <span style={{ color: 'var(--text-muted)' }}>--</span>;
-  const pct = ((currentPrice - entryPrice) / entryPrice) * 100;
-  const nearPnl = size ? ((currentPrice - entryPrice) / entryPrice) * size : null;
+function PnlBadge({ entryPrice, currentPrice, size, pnlPercent }) {
+  const pct = pnlPercent !== undefined && !isNaN(pnlPercent)
+    ? pnlPercent
+    : (entryPrice && currentPrice ? ((currentPrice - entryPrice) / entryPrice) * 100 : 0);
   const isPos = pct >= 0;
+  const nearPnl = size ? (pct / 100) * size : null;
   return (
     <span style={{ color: isPos ? 'var(--accent-green)' : 'var(--accent-red)', fontWeight: 700, fontFamily: 'var(--font-mono)' }}>
       {isPos ? '+' : ''}{pct.toFixed(2)}%
@@ -54,12 +55,20 @@ export default function ActiveOrdersTable({ positions = [], currentPrice, onClos
     return `$${p.toFixed(4)}`;
   };
 
+  const fmtTime = (ts) => {
+    if (!ts) return '--';
+    const d = new Date(ts);
+    if (isNaN(d.getTime())) return '--';
+    return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+  };
+
   return (
     <div style={{ overflowX: 'auto', cursor: 'default', userSelect: 'none' }}>
       <table className="data-table">
         <thead>
           <tr>
             <th title="Unique session identifier for this programmatic order">Order ID</th>
+            <th title="Exact time when the order entered the position">Opened</th>
             <th title="Traded asset symbol or NEP-141 contract">Token</th>
             <th title="Principal capital allocated in NEAR">Size (Ⓝ)</th>
             <th title="Execution fill price at time of entry">Entry</th>
@@ -73,10 +82,14 @@ export default function ActiveOrdersTable({ positions = [], currentPrice, onClos
         </thead>
         <tbody>
           {positions.map((pos) => {
-            const price = currentPrice || pos.entryPrice;
-            const slPrice = pos.entryPrice ? pos.entryPrice * (1 + (pos.stopLossPercent || -5) / 100) : null;
-            const tpPrice = pos.entryPrice ? pos.entryPrice * (1 + (pos.takeProfitPercent || 10) / 100) : null;
+            const price = pos.currentPrice || pos.entryPrice;
+            const slPct = pos.sl !== undefined ? pos.sl : (pos.stopLossPercent || -5);
+            const tpPct = pos.tp !== undefined ? pos.tp : (pos.takeProfitPercent || 10);
+            const slPrice = pos.entryPrice ? pos.entryPrice * (1 + slPct / 100) : null;
+            const tpPrice = pos.entryPrice ? pos.entryPrice * (1 + tpPct / 100) : null;
             const isClosing = closingId === pos.orderId;
+            const displaySize = pos.sizeNear ?? pos.amount ?? pos.allocationNear;
+            const openTime = pos.entryTime || pos.createdAt;
 
             return (
               <tr key={pos.orderId}>
@@ -86,12 +99,17 @@ export default function ActiveOrdersTable({ positions = [], currentPrice, onClos
                   </span>
                 </td>
                 <td>
+                  <span className="mono" style={{ fontSize: '0.69rem', color: 'var(--text-secondary)' }} title={openTime ? new Date(openTime).toLocaleString() : '--'}>
+                    {fmtTime(openTime)}
+                  </span>
+                </td>
+                <td>
                   <span style={{ fontWeight: 600, color: 'var(--text-primary)' }}>
                     {pos.token || pos.tokenSymbol || 'NEAR'}
                   </span>
                 </td>
                 <td>
-                  <span className="mono">{pos.allocationNear?.toFixed(3) || pos.amount?.toFixed(3) || '--'}</span>
+                  <span className="mono">{displaySize != null ? Number(displaySize).toFixed(3) : '--'}</span>
                 </td>
                 <td>
                   <span className="mono" style={{ color: 'var(--text-secondary)' }}>{fmt(pos.entryPrice)}</span>
@@ -109,7 +127,8 @@ export default function ActiveOrdersTable({ positions = [], currentPrice, onClos
                   <PnlBadge
                     entryPrice={pos.entryPrice}
                     currentPrice={price}
-                    size={pos.allocationNear || pos.amount}
+                    pnlPercent={pos.pnlPercent}
+                    size={displaySize}
                   />
                 </td>
                 <td>

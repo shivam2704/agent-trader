@@ -24,6 +24,7 @@ export default function TradeHistory({ trades = [] }) {
       <table className="data-table">
         <thead>
           <tr>
+            <th title="Timestamp when the trade was settled and capital returned">Settled At</th>
             <th title="Position side: LONG or SHORT">Side</th>
             <th title="Allocated capital in NEAR">Size</th>
             <th title="Fill price at entry compared to final exit fill price">Entry → Exit</th>
@@ -47,6 +48,14 @@ export default function TradeHistory({ trades = [] }) {
 
             return (
               <tr key={t.id}>
+                <td>
+                  <div className="mono" style={{ fontSize: '0.69rem', color: 'var(--text-secondary)' }}>
+                    {t.timestamp ? new Date(t.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }) : '--'}
+                  </div>
+                  <div className="mono" style={{ fontSize: '0.61rem', color: 'var(--text-muted)' }}>
+                    {t.timestamp ? new Date(t.timestamp).toLocaleDateString([], { month: 'short', day: 'numeric' }) : ''}
+                  </div>
+                </td>
                 <td>
                   <span style={{
                     padding: '2px 7px', borderRadius: '3px', fontWeight: 700, fontSize: '0.7rem', letterSpacing: '0.03em',
