@@ -168,13 +168,12 @@ export default function App() {
     }
   };
 
-  const targetWallet =
-    state.position?.returnWallet ||
-    state.activeOrder?.wallet ||
-    state.config?.wallet ||
-    null;
-
   const activePositions = state.activePositions || [];
+  const hasActivePositions = activePositions.length > 0 || Boolean(state.position?.inPosition);
+
+  const targetWallet = hasActivePositions
+    ? (state.position?.returnWallet || activePositions[0]?.returnWallet || null)
+    : null;
 
   return (
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', background: 'var(--bg-primary)' }}>

@@ -106,8 +106,8 @@ export default function Navbar({ marketPrice, marketSymbol, agentStatus, targetW
           </span>
         </div>
 
-        {/* Active Return Wallet (if present) */}
-        {targetWallet && (
+        {/* Active Return Wallet (strictly when in active position) */}
+        {isInPosition && targetWallet && (
           <div style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '4px 10px', borderRadius: '6px', background: 'var(--accent-green-dim)', border: '1px solid var(--accent-green)', cursor: 'default', userSelect: 'none' }} title={`Active Caller Return Wallet: ${targetWallet}. All trade capital and profits are auto-refunded here.`}>
             <Radio size={11} color="var(--accent-green)" />
             <span className="mono" style={{ fontSize: 'var(--text-xs)', color: 'var(--accent-green)', fontWeight: 600 }}>
