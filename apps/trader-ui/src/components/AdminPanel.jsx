@@ -1,9 +1,10 @@
 // frontend/src/components/AdminPanel.jsx
 import React, { useState, useEffect } from 'react';
-import { Bot, Play, Square, Copy, Check, Terminal, ShieldCheck, ArrowRightLeft, Coins, CheckCircle2, XCircle, Loader2, Zap, ExternalLink, RefreshCw } from 'lucide-react';
+import { Bot, Cpu, Play, Square, Copy, Check, Terminal, ShieldCheck, ArrowRightLeft, Coins, CheckCircle2, XCircle, Loader2, Zap, ExternalLink, RefreshCw } from 'lucide-react';
 
 export default function AdminPanel({
   config,
+  marketSymbol,
   agentStatus,
   onDispatchPayload,
   onCloseAndReturn,
@@ -19,6 +20,7 @@ export default function AdminPanel({
   const [maxTrades, setMaxTrades] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [copiedToken, setCopiedToken] = useState(false);
   const [responseMsg, setResponseMsg] = useState(null);
   const [intentPreview, setIntentPreview] = useState(null);
   const [fetchingQuote, setFetchingQuote] = useState(false);
@@ -38,14 +40,12 @@ export default function AdminPanel({
     }
   }, [config]);
 
-  const presets = [
-    { label: 'NEAR', id: 'wrap.testnet' },
-    { label: 'ETH', id: 'weth.fakes.testnet' },
-    { label: 'BTC', id: 'wbtc.fakes.testnet' },
-    { label: 'SOL', id: 'sol.fakes.testnet' },
-    { label: 'AURORA', id: 'aurora.fakes.testnet' },
-    { label: 'USDC', id: 'usdc.fakes.testnet' },
-  ];
+  // Auto-sync token when user switches active market coin on chart
+  useEffect(() => {
+    if (config?.tokenPair) {
+      setToken(config.tokenPair);
+    }
+  }, [config?.tokenPair]);
 
   // Live JSON Payload Object
   const currentPayload = {
@@ -127,34 +127,73 @@ export default function AdminPanel({
     setTimeout(() => setCopied(false), 2000);
   };
 
+  const copyToken = () => {
+    if (!token) return;
+    navigator.clipboard.writeText(token.trim());
+    setCopiedToken(true);
+    setTimeout(() => setCopiedToken(false), 2000);
+  };
+
   const isInPosition = agentStatus === 'IN_POSITION';
 
   return (
-    <div className="glass-panel" style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
+    <div className="glass-panel" style={{ padding: '16px 18px', display: 'flex', flexDirection: 'column', gap: '14px' }}>
       {/* Header */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid var(--border-subtle)', paddingBottom: '14px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-          <Cpu size={20} color="var(--accent-blue)" />
-          <div>
-            <h2 style={{ fontSize: '0.98rem', fontWeight: 700, color: 'var(--text-primary)' }}>Programmatic Intent Gateway</h2>
-            <span style={{ fontSize: '0.68rem', color: 'var(--text-muted)' }} className="mono">POST /api/agent/trade</span>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid var(--border-subtle)', paddingBottom: '12px', gap: '8px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', minWidth: 0, flex: 1 }}>
+          <Cpu size={18} color="var(--accent-blue)" style={{ flexShrink: 0 }} />
+          <div style={{ minWidth: 0 }}>
+            <h2 style={{ fontSize: 'var(--text-base)', fontWeight: 700, color: 'var(--text-primary)', margin: 0, lineHeight: 1.2 }}>Intent Gateway</h2>
+            <span style={{ fontSize: 'var(--text-xs)', color: 'var(--text-muted)' }} className="mono">POST /api/agent/trade</span>
           </div>
         </div>
-        <span style={{ fontSize: '0.63rem', background: 'var(--accent-blue-dim)', color: 'var(--accent-blue)', padding: '2px 8px', borderRadius: '4px', fontWeight: 700, letterSpacing: '0.04em' }}>
+        <span
+          title="NEAR Intents Protocol v1.2 with Scoped Session Execution"
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            whiteSpace: 'nowrap',
+            flexShrink: 0,
+            fontSize: '0.65rem',
+            background: 'var(--accent-blue-dim)',
+            color: 'var(--accent-blue)',
+            padding: '3px 7px',
+            borderRadius: '4px',
+            fontWeight: 700,
+            letterSpacing: '0.04em',
+            lineHeight: 1,
+          }}
+        >
           INTENTS v1.2
         </span>
       </div>
 
-      <form onSubmit={handleDispatch} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+      <form onSubmit={handleDispatch} style={{ display: 'flex', flexDirection: 'column', gap: '13px' }}>
         {/* FIELD 1: WALLET (Return Destination) */}
         <div>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
-            <label style={{ fontSize: '0.8rem', fontWeight: 700, color: '#fff', display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <ArrowRightLeft size={14} color="var(--accent-green)" />
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '5px' }}>
+            <label style={{ fontSize: 'var(--text-sm)', fontWeight: 600, color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <ArrowRightLeft size={13} color="var(--accent-green)" />
               Caller Wallet (`wallet`)
             </label>
-            <span style={{ fontSize: '0.65rem', color: 'var(--accent-green)', fontWeight: 700 }}>
-              AUTO-RETURN DESTINATION
+            <span
+              title="Autonomous Return: Capital & profit are guaranteed to return to this address on SL/TP"
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                whiteSpace: 'nowrap',
+                flexShrink: 0,
+                fontSize: '0.63rem',
+                color: 'var(--accent-green)',
+                fontWeight: 700,
+                background: 'var(--accent-green-dim)',
+                padding: '2px 6px',
+                borderRadius: '4px',
+                lineHeight: 1,
+                letterSpacing: '0.03em',
+              }}
+            >
+              AUTO-RETURN
             </span>
           </div>
           <input
@@ -162,60 +201,87 @@ export default function AdminPanel({
             value={wallet}
             onChange={(e) => setWallet(e.target.value)}
             placeholder="e.g. client_agent_vault.testnet"
-            className="mono"
-            style={{ width: '100%', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(0,255,136,0.3)', borderRadius: '8px', padding: '10px 12px', color: '#fff', fontSize: '0.85rem', outline: 'none' }}
+            style={{ width: '100%', background: 'var(--bg-input)', border: '1px solid var(--border-subtle)', borderRadius: '6px', padding: '8px 12px', color: 'var(--text-primary)', fontSize: 'var(--text-base)', outline: 'none' }}
           />
-          <span style={{ fontSize: '0.68rem', color: 'var(--text-muted)', marginTop: '4px', display: 'block' }}>
+          <span style={{ fontSize: 'var(--text-xs)', color: 'var(--text-muted)', marginTop: '3px', display: 'block', lineHeight: 1.35 }}>
             When position closes or SL triggers, capital + profit will be sent back to this wallet.
           </span>
         </div>
 
-        {/* FIELD 2: TOKEN */}
+        {/* FIELD 2: TARGET TOKEN */}
         <div>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
-            <label style={{ fontSize: '0.8rem', fontWeight: 700, color: '#fff', display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <Coins size={14} color="var(--accent-cyan)" />
-              Target Token Contract (`token`)
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '5px' }}>
+            <label style={{ fontSize: 'var(--text-sm)', fontWeight: 600, color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <Coins size={13} color="var(--accent-blue)" />
+              Target Asset (`token`)
             </label>
-            <span style={{ fontSize: '0.65rem', color: 'var(--text-muted)' }}>NEP-141 / Presets</span>
+            <span
+              title="Automatically synced with active chart market"
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                whiteSpace: 'nowrap',
+                flexShrink: 0,
+                fontSize: '0.63rem',
+                color: 'var(--accent-blue)',
+                fontWeight: 700,
+                background: 'var(--accent-blue-dim)',
+                padding: '2px 6px',
+                borderRadius: '4px',
+                lineHeight: 1,
+                letterSpacing: '0.03em',
+              }}
+            >
+              SYNCED TO CHART
+            </span>
           </div>
-          <div style={{ display: 'flex', gap: '6px', marginBottom: '8px', flexWrap: 'wrap' }}>
-            {presets.map((p) => (
-              <button
-                key={p.id}
-                type="button"
-                onClick={() => {
-                  setToken(p.id);
-                  if (onSelectToken) onSelectToken({ symbol: p.label, testnetContract: p.id });
-                }}
-                style={{
-                  fontSize: '0.68rem',
-                  padding: '3px 8px',
-                  borderRadius: '5px',
-                  background: token === p.id ? 'rgba(0,240,255,0.2)' : 'rgba(255,255,255,0.05)',
-                  border: token === p.id ? '1px solid var(--accent-cyan)' : '1px solid var(--border-subtle)',
-                  color: token === p.id ? '#00f0ff' : 'var(--text-secondary)',
-                  cursor: 'pointer',
-                  fontWeight: 700,
-                }}
-              >
-                {p.label}
-              </button>
-            ))}
+          <div
+            style={{
+              width: '100%',
+              background: 'var(--bg-input)',
+              border: '1px solid var(--border-subtle)',
+              borderRadius: '6px',
+              padding: '8px 12px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              boxSizing: 'border-box',
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', minWidth: 0 }}>
+              <span style={{ fontSize: 'var(--text-base)', fontWeight: 800, color: 'var(--text-primary)' }}>
+                {marketSymbol || (token.includes('.') ? token.split('.')[0].toUpperCase() : token)}
+              </span>
+              <span className="mono" style={{ fontSize: 'var(--text-xs)', color: 'var(--text-muted)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '140px' }} title={token}>
+                ({token.length > 18 ? `${token.slice(0, 8)}…${token.slice(-6)}` : token})
+              </span>
+            </div>
+            <button
+              type="button"
+              onClick={copyToken}
+              title={`Copy NEP-141 contract: ${token}`}
+              style={{
+                background: 'none',
+                border: 'none',
+                color: copiedToken ? 'var(--accent-green)' : 'var(--text-muted)',
+                cursor: 'pointer',
+                padding: '2px',
+                display: 'flex',
+                alignItems: 'center',
+                flexShrink: 0,
+              }}
+            >
+              {copiedToken ? <Check size={13} /> : <Copy size={13} />}
+            </button>
           </div>
-          <input
-            type="text"
-            value={token}
-            onChange={(e) => setToken(e.target.value)}
-            placeholder="e.g. wrap.testnet"
-            className="mono"
-            style={{ width: '100%', background: 'rgba(0,0,0,0.3)', border: '1px solid var(--border-subtle)', borderRadius: '8px', padding: '10px 12px', color: '#fff', fontSize: '0.85rem', outline: 'none' }}
-          />
+          <span style={{ fontSize: 'var(--text-xs)', color: 'var(--text-muted)', marginTop: '3px', display: 'block', lineHeight: 1.35 }}>
+            Auto-synced with active chart coin. Payload automatically uses NEP-141 contract.
+          </span>
         </div>
 
         {/* FIELD 3: AMOUNT */}
         <div>
-          <label style={{ fontSize: '0.8rem', fontWeight: 700, color: '#fff', display: 'block', marginBottom: '6px' }}>
+          <label style={{ fontSize: 'var(--text-sm)', fontWeight: 600, color: 'var(--text-primary)', display: 'block', marginBottom: '5px' }}>
             Allocation Amount (`amount`)
           </label>
           <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
@@ -228,32 +294,32 @@ export default function AdminPanel({
               className="mono"
               style={{
                 width: '100%',
-                background: 'rgba(0,0,0,0.3)',
+                background: 'var(--bg-input)',
                 border: '1px solid var(--border-subtle)',
-                borderRadius: '8px',
-                padding: '10px 96px 10px 12px',
-                color: '#fff',
-                fontSize: '0.9rem',
+                borderRadius: '6px',
+                padding: '8px 88px 8px 12px',
+                color: 'var(--text-primary)',
+                fontSize: 'var(--text-base)',
                 outline: 'none',
               }}
             />
-            <div style={{ position: 'absolute', right: '8px', display: 'flex', alignItems: 'center', gap: '3px' }}>
+            <div style={{ position: 'absolute', right: '6px', display: 'flex', alignItems: 'center', gap: '3px' }}>
               <button
                 type="button"
                 onClick={() => setAmount((prev) => Math.max(0.1, +(parseFloat(prev || 0) - 0.5).toFixed(2)))}
                 title="Decrease (-0.5 NEAR)"
                 style={{
-                  background: 'rgba(255,255,255,0.08)',
+                  background: 'var(--border-subtle)',
                   border: '1px solid var(--border-subtle)',
                   borderRadius: '4px',
-                  color: '#fff',
+                  color: 'var(--text-primary)',
                   width: '20px',
-                  height: '24px',
+                  height: '22px',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
                   cursor: 'pointer',
-                  fontSize: '0.8rem',
+                  fontSize: 'var(--text-sm)',
                   fontWeight: 700,
                 }}
               >
@@ -264,23 +330,23 @@ export default function AdminPanel({
                 onClick={() => setAmount((prev) => +(parseFloat(prev || 0) + 0.5).toFixed(2))}
                 title="Increase (+0.5 NEAR)"
                 style={{
-                  background: 'rgba(255,255,255,0.08)',
+                  background: 'var(--border-subtle)',
                   border: '1px solid var(--border-subtle)',
                   borderRadius: '4px',
-                  color: '#fff',
+                  color: 'var(--text-primary)',
                   width: '20px',
-                  height: '24px',
+                  height: '22px',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
                   cursor: 'pointer',
-                  fontSize: '0.8rem',
+                  fontSize: 'var(--text-sm)',
                   fontWeight: 700,
                 }}
               >
                 +
               </button>
-              <span style={{ fontSize: '0.75rem', color: 'var(--accent-cyan)', fontWeight: 800, paddingLeft: '4px' }}>
+              <span style={{ fontSize: 'var(--text-sm)', color: 'var(--accent-blue)', fontWeight: 800, paddingLeft: '4px', userSelect: 'none' }}>
                 NEAR
               </span>
             </div>
@@ -288,9 +354,9 @@ export default function AdminPanel({
         </div>
 
         {/* FIELD 4 & 5: STOP LOSS & TAKE PROFIT */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
           <div>
-            <label style={{ fontSize: '0.78rem', fontWeight: 700, color: 'var(--accent-red)', display: 'block', marginBottom: '6px' }}>
+            <label style={{ fontSize: 'var(--text-sm)', fontWeight: 600, color: 'var(--accent-red)', display: 'block', marginBottom: '5px' }}>
               🛑 Stop-Loss % (`sl`)
             </label>
             <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
@@ -304,16 +370,16 @@ export default function AdminPanel({
                 className="mono"
                 style={{
                   width: '100%',
-                  background: 'rgba(255,51,102,0.06)',
-                  border: '1px solid rgba(255,51,102,0.3)',
-                  borderRadius: '8px',
-                  padding: '10px 78px 10px 12px',
-                  color: '#fff',
-                  fontSize: '0.88rem',
+                  background: 'var(--accent-red-dim)',
+                  border: '1px solid rgba(239,68,68,0.25)',
+                  borderRadius: '6px',
+                  padding: '8px 74px 8px 10px',
+                  color: 'var(--text-primary)',
+                  fontSize: 'var(--text-base)',
                   outline: 'none',
                 }}
               />
-              <div style={{ position: 'absolute', right: '8px', display: 'flex', alignItems: 'center', gap: '3px' }}>
+              <div style={{ position: 'absolute', right: '6px', display: 'flex', alignItems: 'center', gap: '2px' }}>
                 <button
                   type="button"
                   onClick={() => setSl((prev) => Math.max(0.5, +(parseFloat(prev || 0) - 0.5).toFixed(1)))}
@@ -329,7 +395,7 @@ export default function AdminPanel({
                     alignItems: 'center',
                     justifyContent: 'center',
                     cursor: 'pointer',
-                    fontSize: '0.8rem',
+                    fontSize: 'var(--text-sm)',
                     fontWeight: 800,
                   }}
                 >
@@ -350,13 +416,13 @@ export default function AdminPanel({
                     alignItems: 'center',
                     justifyContent: 'center',
                     cursor: 'pointer',
-                    fontSize: '0.8rem',
+                    fontSize: 'var(--text-sm)',
                     fontWeight: 800,
                   }}
                 >
                   +
                 </button>
-                <span style={{ fontSize: '0.75rem', color: 'var(--accent-red)', fontWeight: 800, paddingLeft: '2px' }}>
+                <span style={{ fontSize: 'var(--text-sm)', color: 'var(--accent-red)', fontWeight: 800, paddingLeft: '2px' }}>
                   %
                 </span>
               </div>
@@ -364,7 +430,7 @@ export default function AdminPanel({
           </div>
 
           <div>
-            <label style={{ fontSize: '0.78rem', fontWeight: 700, color: 'var(--accent-green)', display: 'block', marginBottom: '6px' }}>
+            <label style={{ fontSize: 'var(--text-sm)', fontWeight: 600, color: 'var(--accent-green)', display: 'block', marginBottom: '5px' }}>
               🎯 Take-Profit % (`tp`)
             </label>
             <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
@@ -378,16 +444,16 @@ export default function AdminPanel({
                 className="mono"
                 style={{
                   width: '100%',
-                  background: 'rgba(0,255,136,0.06)',
-                  border: '1px solid rgba(0,255,136,0.3)',
-                  borderRadius: '8px',
-                  padding: '10px 78px 10px 12px',
-                  color: '#fff',
-                  fontSize: '0.88rem',
+                  background: 'var(--accent-green-dim)',
+                  border: '1px solid rgba(16,185,129,0.25)',
+                  borderRadius: '6px',
+                  padding: '8px 74px 8px 10px',
+                  color: 'var(--text-primary)',
+                  fontSize: 'var(--text-base)',
                   outline: 'none',
                 }}
               />
-              <div style={{ position: 'absolute', right: '8px', display: 'flex', alignItems: 'center', gap: '3px' }}>
+              <div style={{ position: 'absolute', right: '6px', display: 'flex', alignItems: 'center', gap: '2px' }}>
                 <button
                   type="button"
                   onClick={() => setTp((prev) => Math.max(1, +(parseFloat(prev || 0) - 0.5).toFixed(1)))}
@@ -403,7 +469,7 @@ export default function AdminPanel({
                     alignItems: 'center',
                     justifyContent: 'center',
                     cursor: 'pointer',
-                    fontSize: '0.8rem',
+                    fontSize: 'var(--text-sm)',
                     fontWeight: 800,
                   }}
                 >
@@ -424,13 +490,13 @@ export default function AdminPanel({
                     alignItems: 'center',
                     justifyContent: 'center',
                     cursor: 'pointer',
-                    fontSize: '0.8rem',
+                    fontSize: 'var(--text-sm)',
                     fontWeight: 800,
                   }}
                 >
                   +
                 </button>
-                <span style={{ fontSize: '0.75rem', color: 'var(--accent-green)', fontWeight: 800, paddingLeft: '2px' }}>
+                <span style={{ fontSize: 'var(--text-sm)', color: 'var(--accent-green)', fontWeight: 800, paddingLeft: '2px' }}>
                   %
                 </span>
               </div>
@@ -439,38 +505,43 @@ export default function AdminPanel({
         </div>
 
         {/* ADVANCED AGENT CONTROLS: TRAILING SL & MAX TRADES CAMPAIGN */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: '10px', alignItems: 'center', background: 'rgba(255,255,255,0.02)', border: '1px solid var(--border-subtle)', borderRadius: '8px', padding: '10px 12px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: '8px', alignItems: 'center', background: 'var(--bg-input)', border: '1px solid var(--border-subtle)', borderRadius: '6px', padding: '8px 10px' }}>
           {/* Trailing Stop Toggle */}
-          <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontSize: '0.76rem', color: '#fff', fontWeight: 600 }}>
+          <label
+            title="Trailing Stop-Loss: Automatically ratchets stop-loss floor upward as asset reaches new highs"
+            style={{ display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer', fontSize: 'var(--text-sm)', color: 'var(--text-primary)', fontWeight: 600, userSelect: 'none' }}
+          >
             <input
               type="checkbox"
               checked={trailingStop}
               onChange={(e) => setTrailingStop(e.target.checked)}
-              style={{ cursor: 'pointer', width: '15px', height: '15px', accentColor: 'var(--accent-cyan)' }}
+              style={{ cursor: 'pointer', width: '14px', height: '14px', accentColor: 'var(--accent-blue)' }}
             />
-            <span style={{ color: trailingStop ? 'var(--accent-cyan)' : 'var(--text-secondary)' }}>
+            <span style={{ color: trailingStop ? 'var(--accent-blue)' : 'var(--text-secondary)', whiteSpace: 'nowrap' }}>
               📈 Trailing SL (Ratchet)
             </span>
           </label>
 
           {/* Max Trades Campaign Counter */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', justifyContent: 'flex-end' }}>
-            <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>Trades:</span>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '2px', background: 'rgba(0,0,0,0.4)', border: '1px solid var(--border-subtle)', borderRadius: '6px', padding: '2px 4px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '5px', justifyContent: 'flex-end', userSelect: 'none' }} title="Maximum sequential trade iterations before engine pauses">
+            <span style={{ fontSize: 'var(--text-xs)', color: 'var(--text-muted)', whiteSpace: 'nowrap' }}>Trades:</span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '2px', background: 'var(--bg-card)', border: '1px solid var(--border-subtle)', borderRadius: '4px', padding: '2px 4px' }}>
               <button
                 type="button"
                 onClick={() => setMaxTrades((prev) => Math.max(1, prev - 1))}
-                style={{ background: 'none', border: 'none', color: '#fff', cursor: 'pointer', fontSize: '0.8rem', padding: '0 4px', fontWeight: 800 }}
+                title="Decrease trade count limit"
+                style={{ background: 'none', border: 'none', color: 'var(--text-primary)', cursor: 'pointer', fontSize: 'var(--text-sm)', padding: '0 3px', fontWeight: 800 }}
               >
                 -
               </button>
-              <span className="mono" style={{ fontSize: '0.8rem', minWidth: '16px', textAlign: 'center', color: 'var(--accent-cyan)', fontWeight: 700 }}>
+              <span className="mono" style={{ fontSize: 'var(--text-sm)', minWidth: '16px', textAlign: 'center', color: 'var(--accent-blue)', fontWeight: 700 }}>
                 {maxTrades}
               </span>
               <button
                 type="button"
                 onClick={() => setMaxTrades((prev) => Math.min(10, prev + 1))}
-                style={{ background: 'none', border: 'none', color: '#fff', cursor: 'pointer', fontSize: '0.8rem', padding: '0 4px', fontWeight: 800 }}
+                title="Increase trade count limit"
+                style={{ background: 'none', border: 'none', color: 'var(--text-primary)', cursor: 'pointer', fontSize: 'var(--text-sm)', padding: '0 3px', fontWeight: 800 }}
               >
                 +
               </button>
@@ -479,30 +550,31 @@ export default function AdminPanel({
         </div>
 
         {/* LIVE JSON PAYLOAD PREVIEW */}
-        <div style={{ background: 'rgba(0,0,0,0.5)', border: '1px solid var(--border-subtle)', borderRadius: '10px', padding: '12px' }}>
+        <div style={{ background: 'var(--bg-input)', border: '1px solid var(--border-subtle)', borderRadius: '10px', padding: '12px' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
-            <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '4px' }}>
-              <Terminal size={12} color="var(--accent-cyan)" /> Live Agent JSON Payload:
+            <span style={{ fontSize: 'var(--text-xs)', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '4px' }}>
+              <Terminal size={12} color="var(--accent-blue)" /> Live Agent JSON Payload:
             </span>
             <button
               type="button"
               onClick={copyCurl}
-              style={{ background: 'none', border: 'none', color: copied ? 'var(--accent-green)' : 'var(--accent-cyan)', fontSize: '0.7rem', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}
+              style={{ background: 'none', border: 'none', color: copied ? 'var(--accent-green)' : 'var(--accent-blue)', fontSize: 'var(--text-xs)', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}
             >
               {copied ? <Check size={12} /> : <Copy size={12} />} {copied ? 'Copied' : 'Copy cURL'}
             </button>
           </div>
-          <pre className="mono" style={{ fontSize: '0.72rem', color: '#00f0ff', margin: 0, overflowX: 'auto', lineHeight: '1.4' }}>
+          <pre className="mono" style={{ fontSize: 'var(--text-xs)', color: 'var(--accent-blue)', margin: 0, overflowX: 'auto', lineHeight: '1.45' }}>
             {JSON.stringify(currentPayload, null, 2)}
           </pre>
         </div>
 
         {/* NEAR INTENTS / 1-CLICK SOLVER PROTOCOL CARD */}
         <div
+          title="Query live Defuse solvers for gasless 1-click atomic swap routing"
           style={{
-            background: 'linear-gradient(135deg, rgba(0,240,255,0.06) 0%, rgba(0,255,136,0.03) 100%)',
-            border: '1px solid rgba(0,240,255,0.25)',
-            borderRadius: '10px',
+            background: 'var(--accent-blue-dim)',
+            border: '1px solid var(--border-subtle)',
+            borderRadius: '8px',
             padding: '12px 14px',
             display: 'flex',
             flexDirection: 'column',
@@ -511,8 +583,8 @@ export default function AdminPanel({
         >
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <Zap size={14} color="var(--accent-cyan)" />
-              <span style={{ fontSize: '0.75rem', fontWeight: 800, color: '#fff', letterSpacing: '0.02em' }}>
+              <Zap size={14} color="var(--accent-blue)" />
+              <span style={{ fontSize: 'var(--text-sm)', fontWeight: 700, color: 'var(--text-primary)', letterSpacing: '0.02em' }}>
                 NEAR Intents (1-Click Defuse)
               </span>
             </div>
@@ -520,13 +592,14 @@ export default function AdminPanel({
               type="button"
               onClick={handleFetchIntentQuote}
               disabled={fetchingQuote}
+              title="Request simulated solver quote for this trade"
               style={{
-                background: 'rgba(0,240,255,0.15)',
-                border: '1px solid rgba(0,240,255,0.3)',
+                background: 'var(--bg-card)',
+                border: '1px solid var(--border-subtle)',
                 borderRadius: '5px',
-                padding: '2px 8px',
-                color: '#00f0ff',
-                fontSize: '0.65rem',
+                padding: '3px 8px',
+                color: 'var(--accent-blue)',
+                fontSize: 'var(--text-xs)',
                 fontWeight: 700,
                 cursor: 'pointer',
                 display: 'flex',
@@ -534,15 +607,15 @@ export default function AdminPanel({
                 gap: '4px',
               }}
             >
-              {fetchingQuote ? <RefreshCw size={10} className="spin" /> : <RefreshCw size={10} />}
+              <RefreshCw size={10} className={fetchingQuote ? 'spin' : ''} />
               {fetchingQuote ? 'Querying Solvers...' : 'Preview Solver Quote'}
             </button>
           </div>
 
-          <div style={{ fontSize: '0.68rem', color: 'var(--text-muted)', lineHeight: '1.4' }}>
+          <div style={{ fontSize: 'var(--text-xs)', color: 'var(--text-muted)', lineHeight: '1.4' }}>
             Atomic solver auction executes swap off-chain with <strong>Zero-MEV</strong> and guaranteed return to:
             <div className="mono" style={{ color: 'var(--accent-green)', fontWeight: 700, marginTop: '2px', wordBreak: 'break-all' }}>
-              refundTo: {wallet}
+              refundTo: {wallet || 'your_agent_wallet.testnet'}
             </div>
           </div>
 
@@ -554,7 +627,7 @@ export default function AdminPanel({
                 border: '1px solid rgba(0,255,136,0.25)',
                 borderRadius: '6px',
                 padding: '8px 10px',
-                fontSize: '0.68rem',
+                fontSize: 'var(--text-xs)',
                 display: 'flex',
                 flexDirection: 'column',
                 gap: '4px',
@@ -562,17 +635,17 @@ export default function AdminPanel({
             >
               <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                 <span style={{ color: 'var(--text-muted)' }}>Solver Quote ID:</span>
-                <span className="mono" style={{ color: '#00f0ff' }}>{intentPreview.quoteId}</span>
+                <span className="mono" style={{ color: 'var(--accent-blue)', fontWeight: 600 }}>{intentPreview.quoteId}</span>
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                 <span style={{ color: 'var(--text-muted)' }}>Estimated Output:</span>
-                <span className="mono" style={{ color: '#00ff88', fontWeight: 800 }}>
+                <span className="mono" style={{ color: 'var(--accent-green)', fontWeight: 800 }}>
                   ~{intentPreview.destination.estimatedAmountOut} {intentPreview.destination.symbol}
                 </span>
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                 <span style={{ color: 'var(--text-muted)' }}>Settlement Speed:</span>
-                <span className="mono" style={{ color: '#fff' }}>{intentPreview.routing.settlementSpeed}</span>
+                <span className="mono" style={{ color: 'var(--text-primary)', fontWeight: 600 }}>{intentPreview.routing.settlementSpeed}</span>
               </div>
             </div>
           )}
@@ -591,7 +664,7 @@ export default function AdminPanel({
               background: 'var(--accent-blue)',
               color: '#ffffff',
               fontWeight: 700,
-              fontSize: '0.85rem',
+              fontSize: 'var(--text-base)',
               cursor: isSubmitting ? 'not-allowed' : 'pointer',
               display: 'flex',
               alignItems: 'center',
@@ -618,7 +691,7 @@ export default function AdminPanel({
                 background: 'var(--accent-red-dim)',
                 color: 'var(--accent-red)',
                 fontWeight: 700,
-                fontSize: '0.8rem',
+                fontSize: 'var(--text-sm)',
                 cursor: isSubmitting ? 'not-allowed' : 'pointer',
                 display: 'flex',
                 alignItems: 'center',
@@ -638,7 +711,7 @@ export default function AdminPanel({
             style={{
               padding: '10px 12px',
               borderRadius: '8px',
-              fontSize: '0.75rem',
+              fontSize: 'var(--text-sm)',
               background: responseMsg.success ? 'rgba(0,255,136,0.1)' : 'rgba(255,51,102,0.1)',
               border: `1px solid ${responseMsg.success ? 'rgba(0,255,136,0.3)' : 'rgba(255,51,102,0.3)'}`,
               color: responseMsg.success ? 'var(--accent-green)' : 'var(--accent-red)',
@@ -649,10 +722,10 @@ export default function AdminPanel({
         )}
 
         {/* Security / Return Guarantee Note */}
-        <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: '8px', padding: '10px 12px', display: 'flex', gap: '8px', alignItems: 'flex-start' }}>
-          <ShieldCheck size={16} color="var(--accent-green)" style={{ flexShrink: 0, marginTop: '2px' }} />
-          <div style={{ fontSize: '0.68rem', color: 'var(--text-muted)', lineHeight: '1.4' }}>
-            <strong style={{ color: '#fff' }}>No Wallet Connect:</strong> Designed for autonomous AI callers. When SL or TP triggers, remaining capital & profits are returned directly on-chain to the specified <span className="mono" style={{ color: '#00ff88' }}>wallet</span>.
+        <div style={{ background: 'var(--bg-input)', border: '1px solid var(--border-subtle)', borderRadius: '6px', padding: '8px 10px', display: 'flex', gap: '8px', alignItems: 'flex-start' }}>
+          <ShieldCheck size={15} color="var(--accent-green)" style={{ flexShrink: 0, marginTop: '2px' }} />
+          <div style={{ fontSize: 'var(--text-xs)', color: 'var(--text-muted)', lineHeight: '1.4' }}>
+            <strong style={{ color: 'var(--text-primary)', fontWeight: 700 }}>No Wallet Connect:</strong> Designed for autonomous AI callers. When SL or TP triggers, remaining capital & profits are returned directly on-chain to the specified <span className="mono" style={{ color: 'var(--accent-green)', fontWeight: 700 }}>wallet</span>.
           </div>
         </div>
       </form>

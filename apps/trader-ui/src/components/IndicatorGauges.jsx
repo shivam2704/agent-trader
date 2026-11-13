@@ -19,14 +19,15 @@ export default function IndicatorGauges({ indicators, signal, reasoning }) {
     : 'var(--accent-amber)';
 
   return (
-    <div className="glass-panel" style={{ padding: '16px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+    <div className="glass-panel" style={{ padding: '16px', display: 'flex', flexDirection: 'column', gap: '12px', cursor: 'default', userSelect: 'none' }}>
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingBottom: '10px', borderBottom: '1px solid var(--border-subtle)' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '7px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '7px' }} title="Technical indicators computed in real time from market oracles">
           <Activity size={14} color="var(--text-muted)" />
           <span style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-secondary)', letterSpacing: '0.03em' }}>INDICATORS</span>
         </div>
         <span
+          title={`Algorithmic Market Sentiment: ${signal || 'NEUTRAL'}`}
           style={{
             fontSize: '0.68rem',
             fontWeight: 700,
@@ -35,6 +36,7 @@ export default function IndicatorGauges({ indicators, signal, reasoning }) {
             background: signal === 'BUY' ? 'var(--accent-green-dim)' : signal === 'SELL' ? 'var(--accent-red-dim)' : 'rgba(255,255,255,0.05)',
             color: signalColor,
             letterSpacing: '0.05em',
+            cursor: 'default',
           }}
         >
           {signal || 'NEUTRAL'}
@@ -42,12 +44,12 @@ export default function IndicatorGauges({ indicators, signal, reasoning }) {
       </div>
 
       {/* RSI */}
-      <div>
+      <div title={`Relative Strength Index (14): ${rsi.toFixed(1)}. <35 is oversold, >70 is overbought.`}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
           <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>RSI (14)</span>
           <span className="mono" style={{ fontSize: '0.82rem', fontWeight: 700, color: rsiColor }}>{rsi.toFixed(1)}</span>
         </div>
-        <div style={{ height: '4px', background: 'rgba(255,255,255,0.08)', borderRadius: '2px', overflow: 'hidden' }}>
+        <div style={{ height: '4px', background: 'var(--border-subtle)', borderRadius: '2px', overflow: 'hidden' }}>
           <div style={{ width: `${Math.min(Math.max(rsi, 0), 100)}%`, height: '100%', background: rsiBarColor, borderRadius: '2px', transition: 'width 0.4s ease' }} />
         </div>
         <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '4px' }}>
@@ -57,15 +59,18 @@ export default function IndicatorGauges({ indicators, signal, reasoning }) {
       </div>
 
       {/* EMA cross */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 10px', background: 'rgba(255,255,255,0.025)', borderRadius: '6px', border: '1px solid var(--border-subtle)' }}>
+      <div
+        title={`Exponential Moving Average: 9-period EMA ($${ema9?.toFixed(3) || '--'}) vs 21-period baseline ($${ema21?.toFixed(3) || '--'})`}
+        style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 10px', background: 'var(--bg-input)', borderRadius: '6px', border: '1px solid var(--border-subtle)' }}
+      >
         <div>
-          <div style={{ fontSize: '0.62rem', color: 'var(--text-muted)', marginBottom: '3px' }}>EMA Cross</div>
+          <div style={{ fontSize: '0.62rem', color: 'var(--text-muted)', marginBottom: '3px' }}>EMA Trend</div>
           <div className="mono" style={{ fontSize: '0.72rem', color: isBullishEma ? 'var(--accent-green)' : 'var(--accent-red)', fontWeight: 700 }}>
-            {isBullishEma ? '▲ Golden Cross' : '▼ Death Cross'}
+            {isBullishEma ? '▲ Bullish Cross' : '▼ Bearish Cross'}
           </div>
         </div>
         <div style={{ textAlign: 'right' }}>
-          <div className="mono" style={{ fontSize: '0.68rem', color: 'var(--accent-cyan)' }}>
+          <div className="mono" style={{ fontSize: '0.68rem', color: 'var(--accent-blue)' }}>
             9: {ema9 != null ? `$${ema9 >= 100 ? ema9.toFixed(2) : ema9.toFixed(3)}` : '--'}
           </div>
           <div className="mono" style={{ fontSize: '0.68rem', color: 'var(--text-secondary)' }}>
@@ -76,7 +81,10 @@ export default function IndicatorGauges({ indicators, signal, reasoning }) {
 
       {/* Reasoning */}
       {reasoning && (
-        <p style={{ fontSize: '0.7rem', color: 'var(--text-muted)', lineHeight: 1.4, borderTop: '1px solid var(--border-subtle)', paddingTop: '8px' }}>
+        <p
+          title="Real-time market assessment from autonomous engine"
+          style={{ fontSize: '0.7rem', color: 'var(--text-muted)', lineHeight: 1.4, borderTop: '1px solid var(--border-subtle)', paddingTop: '8px' }}
+        >
           {reasoning}
         </p>
       )}

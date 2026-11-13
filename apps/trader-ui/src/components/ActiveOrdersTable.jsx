@@ -55,20 +55,20 @@ export default function ActiveOrdersTable({ positions = [], currentPrice, onClos
   };
 
   return (
-    <div style={{ overflowX: 'auto' }}>
+    <div style={{ overflowX: 'auto', cursor: 'default', userSelect: 'none' }}>
       <table className="data-table">
         <thead>
           <tr>
-            <th>Order ID</th>
-            <th>Token</th>
-            <th>Size (Ⓝ)</th>
-            <th>Entry</th>
-            <th>Current</th>
-            <th>SL Floor</th>
-            <th>TP Ceiling</th>
-            <th>Live PnL</th>
-            <th>Return Wallet</th>
-            <th style={{ textAlign: 'right' }}>Action</th>
+            <th title="Unique session identifier for this programmatic order">Order ID</th>
+            <th title="Traded asset symbol or NEP-141 contract">Token</th>
+            <th title="Principal capital allocated in NEAR">Size (Ⓝ)</th>
+            <th title="Execution fill price at time of entry">Entry</th>
+            <th title="Live mark-to-market oracle spot price">Current</th>
+            <th title="Stop-loss trigger price threshold">SL Floor</th>
+            <th title="Take-profit target price threshold">TP Ceiling</th>
+            <th title="Real-time unrealized return percentage and net profit/loss">Live PnL</th>
+            <th title="On-chain destination address where capital & profits are returned">Return Wallet</th>
+            <th style={{ textAlign: 'right' }} title="Manual close action">Action</th>
           </tr>
         </thead>
         <tbody>
@@ -125,6 +125,7 @@ export default function ActiveOrdersTable({ positions = [], currentPrice, onClos
                   <button
                     onClick={() => handleClose(pos)}
                     disabled={isClosing}
+                    title={`Immediately close order ${pos.orderId} and refund principal + profits to ${pos.returnWallet || pos.wallet}`}
                     style={{
                       display: 'inline-flex',
                       alignItems: 'center',

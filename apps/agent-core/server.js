@@ -48,6 +48,7 @@ app.get('/api/health', handleHealth);
 // Interactive OpenAPI & Swagger 3.0 Documentation
 app.get(['/docs', '/api/docs'], (req, res) => {
   res.setHeader('Content-Type', 'text/html');
+  res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
   res.send(renderSwaggerHtml());
 });
 app.get('/openapi.json', (req, res) => {
@@ -83,11 +84,14 @@ app.get('/api/market/history', (req, res) => {
 // 2.2 Switch active chart tracking token
 app.post('/api/market/switch-token', async (req, res) => {
   const { token, symbol } = req.body;
-  const target = symbol || token;
-  if (target) {
-    marketEngine.setTrackingSymbol(target);
-    agentBrain.config.tokenPair = target;
+  const trackingSym = symbol || (token ? token.split('.')[0].toUpperCase() : 'NEAR');
+  const targetContract = token || symbol || 'wrap.testnet';
+  
+  if (trackingSym) {
+    marketEngine.setTrackingSymbol(trackingSym);
   }
+  agentBrain.config.tokenPair = targetContract;
+  
   const state = await marketEngine.updateMarketPrice();
   agentBrain.broadcast();
   res.json(state);

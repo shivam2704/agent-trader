@@ -379,15 +379,17 @@ function renderSwaggerHtml() {
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta name="color-scheme" content="light">
   <title>ZeroDrain AI — Interactive OpenAPI Specification</title>
   <link rel="stylesheet" type="text/css" href="https://unpkg.com/swagger-ui-dist@5/swagger-ui.css" />
   <link rel="icon" type="image/png" href="https://unpkg.com/swagger-ui-dist@5/favicon-32x32.png" />
   <style>
-    body {
+    :root, html, body {
+      color-scheme: light !important;
+      background: #fafafa !important;
+      color: #3b4151 !important;
       margin: 0;
       padding: 0;
-      background: #08090d;
-      color: #e2e8f0;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     }
     .topbar {
@@ -397,10 +399,12 @@ function renderSwaggerHtml() {
       max-width: 1200px;
       margin: 0 auto;
       padding: 24px;
+      background: #fafafa !important;
+      color: #3b4151 !important;
     }
     .custom-header {
-      background: linear-gradient(135deg, rgba(0, 240, 255, 0.1) 0%, rgba(121, 40, 202, 0.1) 100%);
-      border: 1px solid rgba(0, 240, 255, 0.3);
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
       border-radius: 12px;
       padding: 20px 24px;
       margin-bottom: 24px;
@@ -409,93 +413,61 @@ function renderSwaggerHtml() {
       align-items: center;
       flex-wrap: wrap;
       gap: 16px;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
     }
     .custom-header h1 {
       margin: 0;
-      font-size: 1.5rem;
-      background: linear-gradient(90deg, #ffffff 0%, #00f0ff 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
+      font-size: 1.4rem;
+      color: #0f172a;
       font-weight: 800;
     }
     .custom-header a {
-      color: #00f0ff;
+      color: #2563eb;
       text-decoration: none;
       font-size: 0.85rem;
       font-weight: 600;
-      border: 1px solid rgba(0, 240, 255, 0.4);
+      border: 1px solid #cbd5e1;
       padding: 6px 14px;
       border-radius: 6px;
-      background: rgba(0, 240, 255, 0.08);
+      background: #f8fafc;
       transition: all 0.2s;
     }
     .custom-header a:hover {
-      background: rgba(0, 240, 255, 0.2);
-      box-shadow: 0 0 12px rgba(0, 240, 255, 0.4);
+      background: #f1f5f9;
+      border-color: #94a3b8;
     }
-    /* Dark Theme Overrides for Swagger UI */
-    .swagger-ui .info .title {
-      color: #ffffff !important;
+
+    /* Force Light Theme Even if Swagger UI 5 tries to inject html.dark-mode */
+    html.dark-mode, html.dark-mode body, html.dark-mode .swagger-ui {
+      background: #fafafa !important;
+      color: #3b4151 !important;
     }
-    .swagger-ui .info p, .swagger-ui .info li {
-      color: #94a3b8 !important;
+    html.dark-mode .swagger-ui .info .title,
+    html.dark-mode .swagger-ui .opblock-tag,
+    html.dark-mode .swagger-ui .opblock .opblock-summary-path,
+    html.dark-mode .swagger-ui .opblock-summary-description,
+    html.dark-mode .swagger-ui .info p,
+    html.dark-mode .swagger-ui .info li,
+    html.dark-mode .swagger-ui table thead tr th {
+      color: #3b4151 !important;
     }
-    .swagger-ui .scheme-container {
-      background: #0f111a !important;
-      box-shadow: none !important;
-      border: 1px solid #1e293b !important;
-      border-radius: 8px !important;
+    html.dark-mode .swagger-ui .opblock {
+      background: #ffffff !important;
+      border-color: #e2e8f0 !important;
     }
-    .swagger-ui .opblock {
-      background: #0f111a !important;
-      border: 1px solid #1e293b !important;
-      border-radius: 8px !important;
-      box-shadow: none !important;
-      margin-bottom: 12px !important;
+    html.dark-mode .swagger-ui .opblock-body {
+      background: #ffffff !important;
     }
-    .swagger-ui .opblock .opblock-summary {
-      border-color: #1e293b !important;
+    html.dark-mode .swagger-ui .scheme-container {
+      background: #ffffff !important;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05) !important;
     }
-    .swagger-ui .opblock .opblock-summary-path {
-      color: #e2e8f0 !important;
-      font-family: monospace !important;
-    }
-    .swagger-ui .opblock .opblock-summary-description {
-      color: #94a3b8 !important;
-    }
-    .swagger-ui .opblock-body {
-      background: #0a0d14 !important;
-    }
-    .swagger-ui .tabheader li button {
-      color: #94a3b8 !important;
-    }
-    .swagger-ui table thead tr th {
-      color: #cbd5e1 !important;
-      border-color: #1e293b !important;
-    }
-    .swagger-ui .parameters-col_name {
-      color: #f1f5f9 !important;
-    }
-    .swagger-ui .parameter__name {
-      color: #00f0ff !important;
-    }
-    .swagger-ui .response-col_status {
-      color: #00ff88 !important;
-    }
-    .swagger-ui select, .swagger-ui input[type="text"], .swagger-ui textarea {
-      background: #1e293b !important;
-      color: #ffffff !important;
-      border: 1px solid #334155 !important;
-      border-radius: 4px !important;
-    }
-    .swagger-ui .btn {
-      border-radius: 6px !important;
-      font-weight: 600 !important;
-    }
-    .swagger-ui .btn.execute {
-      background-color: #00f0ff !important;
-      color: #000 !important;
-      border-color: #00f0ff !important;
+    html.dark-mode .swagger-ui select,
+    html.dark-mode .swagger-ui input[type="text"],
+    html.dark-mode .swagger-ui textarea {
+      background: #ffffff !important;
+      color: #0f172a !important;
+      border: 1px solid #cbd5e1 !important;
     }
   </style>
 </head>
@@ -504,8 +476,8 @@ function renderSwaggerHtml() {
     <div class="custom-header">
       <div>
         <h1>⚡ ZeroDrain AI: OpenAPI Interactive Explorer</h1>
-        <div style="font-size: 0.8rem; color: #94a3b8; margin-top: 4px;">
-          Smart Contract Vault: <code style="color: #c084fc;">zerodrain-relayer-vault.testnet</code>
+        <div style="font-size: 0.8rem; color: #64748b; margin-top: 4px;">
+          Smart Contract Vault: <code style="color: #7c3aed; font-weight: 700;">zerodrain-relayer-vault.testnet</code>
         </div>
       </div>
       <div>
@@ -517,6 +489,19 @@ function renderSwaggerHtml() {
   <script src="https://unpkg.com/swagger-ui-dist@5/swagger-ui-bundle.js"></script>
   <script src="https://unpkg.com/swagger-ui-dist@5/swagger-ui-standalone-preset.js"></script>
   <script>
+    // Strictly prevent Swagger UI 5 from applying dark-mode
+    try {
+      localStorage.removeItem('dark-mode');
+      localStorage.removeItem('swagger-ui-dark-mode');
+    } catch(e) {}
+    document.documentElement.classList.remove('dark-mode');
+    const observer = new MutationObserver(function() {
+      if (document.documentElement.classList.contains('dark-mode')) {
+        document.documentElement.classList.remove('dark-mode');
+      }
+    });
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+
     window.onload = function() {
       SwaggerUIBundle({
         url: "/openapi.json",

@@ -20,7 +20,7 @@ import {
 } from 'lucide-react';
 
 // Price formatting helper for all magnitudes ($80,000+ down to $0.000004)
-export const formatPrice = (p) => {
+const formatPrice = (p) => {
   if (p === undefined || p === null || isNaN(p)) return '0.00';
   const val = Number(p);
   if (val >= 1000) {
@@ -159,11 +159,23 @@ export default function LiveChart({ marketData, onSelectToken }) {
     });
   }, [rawTokens, chainFilter, searchQuery]);
 
-  // Top popular quick tokens
+  // Top popular quick tokens - strictly deduplicated by symbol (no duplicate ETH/ETH or BTC/BTC)
   const popularTokens = useMemo(() => {
     if (!rawTokens || rawTokens.length === 0) return [];
-    const set = new Set(DEFAULT_POPULAR);
-    return rawTokens.filter((t) => set.has(t.symbol)).slice(0, 12);
+    const targetOrder = ['NEAR', 'ETH', 'BTC', 'SOL', 'USDC'];
+    const seen = new Set();
+    const result = [];
+    for (const sym of targetOrder) {
+      const matches = rawTokens.filter((t) => t.symbol === sym);
+      if (matches.length > 0) {
+        const preferred = matches.find((t) => t.blockchain === 'near') || matches[0];
+        if (!seen.has(preferred.symbol)) {
+          seen.add(preferred.symbol);
+          result.push(preferred);
+        }
+      }
+    }
+    return result;
   }, [rawTokens]);
 
   // Effective price points based on selected timeframe
@@ -341,10 +353,10 @@ export default function LiveChart({ marketData, onSelectToken }) {
     <div
       className="glass-panel"
       style={{
-        padding: '24px',
+        padding: '16px 18px',
         display: 'flex',
         flexDirection: 'column',
-        gap: '18px',
+        gap: '14px',
         width: '100%',
         maxWidth: '100%',
         boxSizing: 'border-box',
@@ -352,68 +364,50 @@ export default function LiveChart({ marketData, onSelectToken }) {
         position: 'relative',
       }}
     >
-      {/* 1. TOP HEADER & MULTI-TOKEN CONTROLLER */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', width: '100%' }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
-          {/* Main Token Selector Button */}
-          <div style={{ position: 'relative' }} ref={pickerRef}>
-            <button
-              type="button"
-              onClick={() => setIsPickerOpen(!isPickerOpen)}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '10px',
-                background: 'rgba(0,240,255,0.1)',
-                border: '1px solid rgba(0,240,255,0.35)',
-                padding: '8px 14px',
-                borderRadius: '10px',
-                color: '#fff',
-                cursor: 'pointer',
-                boxShadow: isPickerOpen ? '0 0 15px rgba(0,240,255,0.3)' : 'none',
-                transition: 'all 0.15s ease',
-              }}
-            >
-              <div
+      {/* 1. STABLE TWO-ROW PRO TERMINAL TOOLBAR (Zero Jitter, Zero Dancing) */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', paddingBottom: '12px', borderBottom: '1px solid var(--border-subtle)' }}>
+        {/* ROW 1: Token Identity + Live Spot Price + Contract Explorer Link (Fixed height 36px) */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'nowrap', gap: '12px', minHeight: '36px' }}>
+          {/* Left: Dropdown Picker + Spot Price */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', minWidth: 0, flexShrink: 0 }}>
+            {/* Main Dropdown Button */}
+            <div style={{ position: 'relative' }} ref={pickerRef}>
+              <button
+                type="button"
+                onClick={() => setIsPickerOpen(!isPickerOpen)}
+                title="Click to search and switch between 230+ tokens"
                 style={{
-                  width: '28px',
-                  height: '28px',
-                  borderRadius: '8px',
-                  background: 'rgba(0,240,255,0.2)',
-                  display: 'flex',
+                  display: 'inline-flex',
                   alignItems: 'center',
-                  justifyContent: 'center',
-                  fontSize: '1rem',
-                  fontWeight: 900,
-                  color: '#00f0ff',
+                  gap: '7px',
+                  background: 'var(--bg-input)',
+                  border: '1px solid var(--border-mid)',
+                  padding: '5px 10px',
+                  borderRadius: '6px',
+                  color: 'var(--text-primary)',
+                  cursor: 'pointer',
+                  transition: 'all 0.15s ease',
+                  whiteSpace: 'nowrap',
                 }}
               >
-                {activeToken.icon || 'Ⓝ'}
-              </div>
-              <div style={{ textAlign: 'left' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  <span style={{ fontSize: '0.95rem', fontWeight: 900, color: '#00f0ff' }}>
-                    {activeToken.displaySymbol || activeToken.symbol}
-                  </span>
-                  <span
-                    style={{
-                      fontSize: '0.62rem',
-                      background: 'rgba(255,255,255,0.08)',
-                      padding: '2px 6px',
-                      borderRadius: '4px',
-                      color: 'var(--text-muted)',
-                      textTransform: 'uppercase',
-                    }}
-                  >
-                    {activeToken.blockchain || 'near'}
-                  </span>
-                </div>
-                <div style={{ fontSize: '0.65rem', color: 'var(--text-muted)' }}>
-                  {rawTokens.length > 0 ? `${rawTokens.length} Tokens Supported` : 'Select Coin'}
-                </div>
-              </div>
-              <ChevronDown size={16} color="var(--accent-cyan)" />
-            </button>
+                <span style={{ fontSize: '1rem', lineHeight: 1 }}>{activeToken.icon || 'Ⓝ'}</span>
+                <span
+                  title={`${activeToken.displaySymbol || activeToken.symbol}/USD`}
+                  style={{
+                    fontSize: '0.88rem',
+                    fontWeight: 800,
+                    color: 'var(--text-primary)',
+                    maxWidth: '180px',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap',
+                    display: 'inline-block',
+                  }}
+                >
+                  {activeToken.displaySymbol || activeToken.symbol}/USD
+                </span>
+                <ChevronDown size={13} color="var(--text-muted)" style={{ flexShrink: 0 }} />
+              </button>
 
             {/* FULL POPUP MODAL/DROPDOWN FOR ALL 200+ TOKENS */}
             {isPickerOpen && (
@@ -424,10 +418,10 @@ export default function LiveChart({ marketData, onSelectToken }) {
                   left: 0,
                   width: '420px',
                   maxHeight: '440px',
-                  background: '#0a0e17',
-                  border: '1px solid var(--accent-cyan)',
-                  borderRadius: '12px',
-                  boxShadow: '0 12px 35px rgba(0,0,0,0.8), 0 0 20px rgba(0,240,255,0.25)',
+                  background: 'var(--bg-card)',
+                  border: '1px solid var(--border-mid)',
+                  borderRadius: '10px',
+                  boxShadow: '0 12px 35px rgba(0,0,0,0.5)',
                   zIndex: 100,
                   display: 'flex',
                   flexDirection: 'column',
@@ -436,7 +430,7 @@ export default function LiveChart({ marketData, onSelectToken }) {
               >
                 {/* Search Bar */}
                 <div style={{ padding: '12px', borderBottom: '1px solid var(--border-subtle)', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <Search size={16} color="var(--accent-cyan)" />
+                  <Search size={16} color="var(--accent-blue)" />
                   <input
                     type="text"
                     autoFocus
@@ -447,7 +441,7 @@ export default function LiveChart({ marketData, onSelectToken }) {
                       flex: 1,
                       background: 'transparent',
                       border: 'none',
-                      color: '#fff',
+                      color: 'var(--text-primary)',
                       fontSize: '0.82rem',
                       outline: 'none',
                     }}
@@ -466,7 +460,7 @@ export default function LiveChart({ marketData, onSelectToken }) {
                     alignItems: 'center',
                     gap: '6px',
                     padding: '8px 12px',
-                    borderBottom: '1px solid rgba(255,255,255,0.08)',
+                    borderBottom: '1px solid var(--border-subtle)',
                     overflowX: 'auto',
                     scrollbarWidth: 'none',
                     msOverflowStyle: 'none',
@@ -492,16 +486,15 @@ export default function LiveChart({ marketData, onSelectToken }) {
                           fontSize: '0.68rem',
                           fontWeight: 700,
                           lineHeight: 1,
-                          padding: '6px 11px',
-                          borderRadius: '6px',
-                          border: isTabActive ? '1px solid var(--accent-cyan)' : '1px solid rgba(255,255,255,0.06)',
-                          background: isTabActive ? 'rgba(0,240,255,0.18)' : 'rgba(255,255,255,0.04)',
-                          color: isTabActive ? '#00f0ff' : 'var(--text-muted)',
+                          padding: '5px 10px',
+                          borderRadius: '5px',
+                          border: isTabActive ? '1px solid var(--accent-blue)' : '1px solid var(--border-subtle)',
+                          background: isTabActive ? 'var(--accent-blue-dim)' : 'var(--bg-input)',
+                          color: isTabActive ? 'var(--accent-blue)' : 'var(--text-muted)',
                           cursor: 'pointer',
                           whiteSpace: 'nowrap',
                           fontFamily: 'inherit',
                           boxSizing: 'border-box',
-                          transition: 'all 0.15s ease',
                         }}
                       >
                         {tab.label}
@@ -527,13 +520,12 @@ export default function LiveChart({ marketData, onSelectToken }) {
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'space-between',
-                            padding: '8px 10px',
-                            borderRadius: '8px',
+                            padding: '7px 10px',
+                            borderRadius: '6px',
                             cursor: 'pointer',
-                            background: isSel ? 'rgba(0,240,255,0.15)' : 'transparent',
-                            border: isSel ? '1px solid rgba(0,240,255,0.3)' : '1px solid transparent',
+                            background: isSel ? 'var(--accent-blue-dim)' : 'transparent',
+                            border: isSel ? '1px solid var(--accent-blue)' : '1px solid transparent',
                             marginBottom: '2px',
-                            transition: 'background 0.1s ease',
                           }}
                         >
                           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -541,8 +533,8 @@ export default function LiveChart({ marketData, onSelectToken }) {
                               style={{
                                 width: '24px',
                                 height: '24px',
-                                borderRadius: '6px',
-                                background: 'rgba(255,255,255,0.05)',
+                                borderRadius: '5px',
+                                background: 'var(--bg-input)',
                                 display: 'flex',
                                 alignItems: 'center',
                                 justifyContent: 'center',
@@ -552,7 +544,7 @@ export default function LiveChart({ marketData, onSelectToken }) {
                               {t.icon || 'Ⓝ'}
                             </div>
                             <div>
-                              <div style={{ fontSize: '0.8rem', fontWeight: 800, color: isSel ? '#00f0ff' : '#fff' }}>
+                              <div style={{ fontSize: '0.8rem', fontWeight: 800, color: 'var(--text-primary)' }}>
                                 {t.displaySymbol || t.symbol}
                               </div>
                               <div style={{ fontSize: '0.62rem', color: 'var(--text-muted)' }}>
@@ -562,7 +554,7 @@ export default function LiveChart({ marketData, onSelectToken }) {
                           </div>
 
                           <div style={{ textAlign: 'right' }}>
-                            <div className="mono" style={{ fontSize: '0.8rem', fontWeight: 800, color: '#fff' }}>
+                            <div className="mono" style={{ fontSize: '0.8rem', fontWeight: 800, color: 'var(--text-primary)' }}>
                               ${formatPrice(t.currentPrice || t.defaultPrice)}
                             </div>
                             <div style={{ fontSize: '0.6rem', color: 'var(--text-muted)' }}>
@@ -578,154 +570,85 @@ export default function LiveChart({ marketData, onSelectToken }) {
             )}
           </div>
 
-          {/* Top Quick Pick Token Chips */}
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '6px',
-              overflowX: 'auto',
-              maxWidth: '520px',
-              paddingBottom: '2px',
-              scrollbarWidth: 'none',
-            }}
-          >
+            {/* Live Price Tag (tabular nums, fixed min-width to prevent digit jitter) */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', minWidth: '110px', flexShrink: 0 }}>
+              <span className="mono" style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--text-primary)', fontVariantNumeric: 'tabular-nums' }}>
+                ${formatPrice(price)}
+              </span>
+              <div style={{ display: 'inline-flex', alignItems: 'center', gap: '3px', background: 'var(--accent-green-dim)', padding: '2px 5px', borderRadius: '4px', flexShrink: 0 }}>
+                <Radio size={7} color="var(--accent-green)" />
+                <span style={{ fontSize: '0.62rem', color: 'var(--accent-green)', fontWeight: 800, letterSpacing: '0.5px' }}>LIVE</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Right: Explorer Link */}
+          {(activeToken.contractId || activeToken.testnetContract) && (
+            <a
+              href={`https://testnet.nearblocks.io/token/${activeToken.testnetContract || activeToken.contractId}`}
+              target="_blank"
+              rel="noreferrer"
+              title="View verified token on NearBlocks Explorer"
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '4px',
+                padding: '4px 8px',
+                background: 'var(--bg-input)',
+                border: '1px solid var(--border-subtle)',
+                borderRadius: '5px',
+                fontSize: 'var(--text-xs)',
+                color: 'var(--accent-blue)',
+                textDecoration: 'none',
+                whiteSpace: 'nowrap',
+                flexShrink: 0,
+              }}
+            >
+              NearBlocks <ExternalLink size={10} />
+            </a>
+          )}
+        </div>
+
+        {/* ROW 2: Quick Token Presets + Timeframe Controls + Chart Type (Fixed height 32px) */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px', minHeight: '32px' }}>
+          
+          {/* Left: Quick Pick Chips */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '5px', overflowX: 'auto', scrollbarWidth: 'none' }}>
             {popularTokens.map((t) => {
               const isSel = t.symbol === symbol;
               return (
                 <button
-                  key={t.symbol}
+                  key={`${t.symbol}_quick`}
                   type="button"
                   onClick={() => onSelectToken && onSelectToken(t)}
+                  title={`Switch to ${t.symbol}`}
                   style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '5px',
                     padding: '4px 9px',
-                    borderRadius: '6px',
-                    border: isSel ? '1px solid #00f0ff' : '1px solid rgba(255,255,255,0.08)',
-                    background: isSel ? 'rgba(0,240,255,0.18)' : 'rgba(255,255,255,0.03)',
-                    color: isSel ? '#00f0ff' : 'var(--text-secondary)',
+                    borderRadius: '5px',
+                    border: isSel ? '1px solid var(--accent-blue)' : '1px solid var(--border-subtle)',
+                    background: isSel ? 'var(--accent-blue-dim)' : 'var(--bg-input)',
+                    color: isSel ? 'var(--accent-blue)' : 'var(--text-secondary)',
                     cursor: 'pointer',
-                    fontSize: '0.72rem',
-                    fontWeight: 800,
+                    fontSize: 'var(--text-sm)',
+                    fontWeight: 600,
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '4px',
                     whiteSpace: 'nowrap',
-                    transition: 'all 0.15s ease',
+                    lineHeight: 1,
                   }}
                 >
-                  <span>{t.icon || 'Ⓝ'}</span>
+                  <span style={{ fontSize: '0.8rem' }}>{t.icon || '🪙'}</span>
                   <span>{t.symbol}</span>
                 </button>
               );
             })}
           </div>
-        </div>
-      </div>
 
-      {/* 2. ACTIVE TOKEN OVERVIEW BANNER */}
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          flexWrap: 'wrap',
-          gap: '14px',
-          background: 'rgba(255,255,255,0.02)',
-          padding: '12px 16px',
-          borderRadius: '10px',
-          border: '1px solid var(--border-subtle)',
-          width: '100%',
-          boxSizing: 'border-box',
-        }}
-      >
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-          <div
-            style={{
-              width: '40px',
-              height: '40px',
-              borderRadius: '10px',
-              background: 'linear-gradient(135deg, rgba(0,240,255,0.2) 0%, rgba(0,128,255,0.1) 100%)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              border: '1px solid rgba(0,240,255,0.4)',
-              fontSize: '1.3rem',
-            }}
-          >
-            {activeToken.icon || 'Ⓝ'}
-          </div>
-          <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <h2 style={{ fontSize: '1.15rem', fontWeight: 900 }}>{activeToken.displaySymbol || activeToken.symbol}/USD</h2>
-              <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>{activeToken.name}</span>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '4px', background: 'rgba(0,255,136,0.12)', padding: '2px 7px', borderRadius: '12px', border: '1px solid rgba(0,255,136,0.3)' }}>
-                <Radio size={9} color="var(--accent-green)" />
-                <span style={{ fontSize: '0.62rem', color: 'var(--accent-green)', fontWeight: 800 }}>LIVE</span>
-              </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '3px', background: 'rgba(0,240,255,0.1)', padding: '2px 6px', borderRadius: '4px', border: '1px solid rgba(0,240,255,0.2)' }}>
-                <Clock size={9} color="var(--accent-cyan)" />
-                <span style={{ fontSize: '0.62rem', color: '#00f0ff', fontWeight: 800 }}>{timeframe.toUpperCase()}</span>
-              </div>
-            </div>
-
-            {/* Contract Chip */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '3px' }}>
-              <div
-                onClick={() => copyContractAddress(activeToken.contractId || activeToken.testnetContract)}
-                title="Click to copy NEAR contract address"
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '4px',
-                  background: 'rgba(0,0,0,0.3)',
-                  padding: '1px 6px',
-                  borderRadius: '4px',
-                  border: '1px solid rgba(255,255,255,0.08)',
-                  cursor: 'pointer',
-                  fontSize: '0.65rem',
-                  color: 'var(--text-muted)',
-                }}
-              >
-                <span>Contract:</span>
-                <span className="mono" style={{ color: 'var(--accent-cyan)', fontWeight: 700 }}>
-                  {(activeToken.contractId || activeToken.testnetContract || '').slice(0, 18)}...
-                </span>
-                {copiedContract ? <Check size={10} color="var(--accent-green)" /> : <Copy size={10} />}
-              </div>
-
-              <a
-                href={`https://testnet.nearblocks.io/token/${activeToken.testnetContract || activeToken.contractId}`}
-                target="_blank"
-                rel="noreferrer"
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '3px',
-                  fontSize: '0.65rem',
-                  color: 'var(--accent-cyan)',
-                  textDecoration: 'none',
-                }}
-              >
-                NearBlocks <ExternalLink size={9} />
-              </a>
-            </div>
-          </div>
-        </div>
-
-        {/* Live Price Display & View Toggles */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '14px', flexWrap: 'wrap' }}>
-          <div>
-            <div className="mono" style={{ fontSize: '1.25rem', fontWeight: 900, color: '#00f0ff', textAlign: 'right' }}>
-              ${formatPrice(price)}
-            </div>
-            <div style={{ fontSize: '0.65rem', color: 'var(--text-muted)', textAlign: 'right' }}>
-              {stats.source || 'Kraken Orderbook & Defuse'}
-            </div>
-          </div>
-
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            {/* Functional Timeframe Pills: TICK, 1m, 5m, 15m */}
-            <div style={{ display: 'flex', background: 'rgba(0,0,0,0.4)', padding: '2px', borderRadius: '6px', border: '1px solid var(--border-subtle)' }}>
+          {/* Right: Timeframes + Chart Type */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexShrink: 0 }}>
+            {/* Timeframe selector */}
+            <div style={{ display: 'flex', background: 'var(--bg-input)', padding: '2px', borderRadius: '5px', border: '1px solid var(--border-subtle)' }}>
               {['TICK', '1m', '5m', '15m'].map((tf) => {
                 const isActive = timeframe === tf;
                 return (
@@ -735,14 +658,13 @@ export default function LiveChart({ marketData, onSelectToken }) {
                     onClick={() => setTimeframe(tf)}
                     title={`Switch chart timeframe to ${tf}`}
                     style={{
-                      fontSize: '0.68rem',
-                      fontWeight: 800,
+                      fontSize: 'var(--text-sm)',
+                      fontWeight: 700,
                       padding: '3px 8px',
                       borderRadius: '4px',
                       border: 'none',
-                      background: isActive ? 'linear-gradient(135deg, rgba(0,240,255,0.3) 0%, rgba(0,180,255,0.2) 100%)' : 'transparent',
-                      color: isActive ? '#00f0ff' : 'var(--text-muted)',
-                      boxShadow: isActive ? '0 0 10px rgba(0,240,255,0.3)' : 'none',
+                      background: isActive ? 'var(--accent-blue-dim)' : 'transparent',
+                      color: isActive ? 'var(--accent-blue)' : 'var(--text-muted)',
                       cursor: 'pointer',
                       transition: 'all 0.15s ease',
                     }}
@@ -754,48 +676,53 @@ export default function LiveChart({ marketData, onSelectToken }) {
             </div>
 
             {/* Chart Type Toggle */}
-            <div style={{ display: 'flex', background: 'rgba(0,0,0,0.4)', padding: '2px', borderRadius: '6px', border: '1px solid var(--border-subtle)' }}>
+            <div style={{ display: 'flex', background: 'var(--bg-input)', padding: '2px', borderRadius: '5px', border: '1px solid var(--border-subtle)' }}>
               <button
                 type="button"
                 onClick={() => setChartType('AREA')}
+                title="Smooth Area chart"
                 style={{
-                  display: 'flex',
+                  display: 'inline-flex',
                   alignItems: 'center',
-                  gap: '3px',
-                  fontSize: '0.65rem',
-                  fontWeight: 700,
-                  padding: '3px 7px',
+                  gap: '4px',
+                  fontSize: 'var(--text-sm)',
+                  fontWeight: 600,
+                  padding: '3px 8px',
                   borderRadius: '4px',
                   border: 'none',
-                  background: chartType === 'AREA' ? 'rgba(0,240,255,0.2)' : 'transparent',
-                  color: chartType === 'AREA' ? '#00f0ff' : 'var(--text-muted)',
+                  background: chartType === 'AREA' ? 'var(--accent-blue-dim)' : 'transparent',
+                  color: chartType === 'AREA' ? 'var(--accent-blue)' : 'var(--text-muted)',
                   cursor: 'pointer',
                 }}
               >
-                <LineChartIcon size={11} /> Area
+                <LineChartIcon size={12} />
+                <span>Area</span>
               </button>
               <button
                 type="button"
                 onClick={() => setChartType('CANDLES')}
+                title="OHLC Candlestick view"
                 style={{
-                  display: 'flex',
+                  display: 'inline-flex',
                   alignItems: 'center',
-                  gap: '3px',
-                  fontSize: '0.65rem',
-                  fontWeight: 700,
-                  padding: '3px 7px',
+                  gap: '4px',
+                  fontSize: 'var(--text-sm)',
+                  fontWeight: 600,
+                  padding: '3px 8px',
                   borderRadius: '4px',
                   border: 'none',
-                  background: chartType === 'CANDLES' ? 'rgba(0,255,136,0.2)' : 'transparent',
-                  color: chartType === 'CANDLES' ? '#00ff88' : 'var(--text-muted)',
+                  background: chartType === 'CANDLES' ? 'var(--accent-blue-dim)' : 'transparent',
+                  color: chartType === 'CANDLES' ? 'var(--accent-blue)' : 'var(--text-muted)',
                   cursor: 'pointer',
                 }}
               >
-                <BarChart2 size={11} /> Candles
+                <BarChart2 size={12} />
+                <span>Candles</span>
               </button>
             </div>
           </div>
         </div>
+
       </div>
 
       {/* 3. RESPONSIVE LOCKED SVG CHART CONTAINER */}
@@ -804,9 +731,9 @@ export default function LiveChart({ marketData, onSelectToken }) {
           position: 'relative',
           width: '100%',
           height: '280px',
-          background: 'linear-gradient(180deg, rgba(8,12,20,0.98) 0%, rgba(4,7,12,1) 100%)',
-          borderRadius: '12px',
-          border: '1px solid rgba(255,255,255,0.08)',
+          background: 'var(--bg-secondary)',
+          borderRadius: '10px',
+          border: '1px solid var(--border-subtle)',
           overflow: 'hidden',
           cursor: 'crosshair',
           boxSizing: 'border-box',
@@ -835,7 +762,7 @@ export default function LiveChart({ marketData, onSelectToken }) {
                 y1={tick.y}
                 x2={chartWidth}
                 y2={tick.y}
-                stroke="rgba(255,255,255,0.05)"
+                stroke="var(--border-subtle)"
                 strokeDasharray="4 4"
               />
               <text
@@ -843,7 +770,7 @@ export default function LiveChart({ marketData, onSelectToken }) {
                 y={tick.y + 4}
                 fill="var(--text-muted)"
                 fontSize="9.5"
-                fontFamily="JetBrains Mono, monospace"
+                fontFamily="var(--font-mono)"
                 fontWeight="500"
               >
                 ${formatPrice(tick.price)}
@@ -852,10 +779,10 @@ export default function LiveChart({ marketData, onSelectToken }) {
           ))}
 
           {/* Right Y-Axis Divider Line */}
-          <line x1={chartWidth} y1="0" x2={chartWidth} y2={chartHeight} stroke="rgba(255,255,255,0.08)" />
+          <line x1={chartWidth} y1="0" x2={chartWidth} y2={chartHeight} stroke="var(--border-subtle)" />
 
           {/* Bottom X-Axis Divider Line */}
-          <line x1="0" y1={chartHeight} x2={chartWidth} y2={chartHeight} stroke="rgba(255,255,255,0.08)" />
+          <line x1="0" y1={chartHeight} x2={chartWidth} y2={chartHeight} stroke="var(--border-subtle)" />
 
           {/* X-Axis Vertical Time Markers & Labels (Formatted by Timeframe) */}
           {xTicks.map((pt, i) => (
@@ -865,7 +792,7 @@ export default function LiveChart({ marketData, onSelectToken }) {
                 y1="0"
                 x2={pt.x}
                 y2={chartHeight}
-                stroke="rgba(255,255,255,0.03)"
+                stroke="var(--border-subtle)"
                 strokeDasharray="4 4"
               />
               {/* Avoid clipping first/last time labels outside SVG viewport */}
@@ -875,7 +802,7 @@ export default function LiveChart({ marketData, onSelectToken }) {
                 textAnchor={i === 0 ? 'start' : i === xTicks.length - 1 ? 'end' : 'middle'}
                 fill="var(--text-muted)"
                 fontSize="10"
-                fontFamily="JetBrains Mono, monospace"
+                fontFamily="var(--font-mono)"
               >
                 {formatTimeTick(pt.time)}
               </text>
@@ -963,7 +890,7 @@ export default function LiveChart({ marketData, onSelectToken }) {
             textAnchor="middle"
             fill="#ffffff"
             fontSize="9.5"
-            fontFamily="JetBrains Mono, monospace"
+            fontFamily="var(--font-mono)"
             fontWeight="900"
           >
             ${formatPrice(price)}
@@ -1015,7 +942,7 @@ export default function LiveChart({ marketData, onSelectToken }) {
                 textAnchor="middle"
                 fill="#00f0ff"
                 fontSize="9"
-                fontFamily="JetBrains Mono, monospace"
+                fontFamily="var(--font-mono)"
                 fontWeight="700"
               >
                 ${formatPrice(hoveredPoint.price)}
@@ -1036,7 +963,7 @@ export default function LiveChart({ marketData, onSelectToken }) {
                 textAnchor="middle"
                 fill="#00f0ff"
                 fontSize="9"
-                fontFamily="JetBrains Mono, monospace"
+                fontFamily="var(--font-mono)"
                 fontWeight="700"
               >
                 {formatTimeTick(hoveredPoint.time)}
@@ -1084,46 +1011,46 @@ export default function LiveChart({ marketData, onSelectToken }) {
         )}
       </div>
 
-      {/* 4. ENHANCED MARKET METRICS BAR */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '12px', width: '100%' }}>
-        <div style={{ background: 'rgba(255,255,255,0.02)', padding: '12px', borderRadius: '10px', border: '1px solid var(--border-subtle)' }}>
+      {/* 4. ENHANCED MARKET METRICS BAR (Fixed Grid, Zero Overflow/Collision) */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '12px', width: '100%', cursor: 'default', userSelect: 'none' }}>
+        <div style={{ background: 'var(--bg-input)', padding: '12px', borderRadius: '8px', border: '1px solid var(--border-subtle)', cursor: 'default', minWidth: 0, overflow: 'hidden' }} title="Highest price recorded in the past 24 hours">
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '4px' }}>
             <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>24h High</span>
             <ArrowUpRight size={14} color="var(--accent-green)" />
           </div>
-          <div className="mono" style={{ fontSize: '0.95rem', fontWeight: 800, color: 'var(--accent-green)' }}>
+          <div className="mono" style={{ fontSize: '0.95rem', fontWeight: 800, color: 'var(--accent-green)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
             ${formatPrice(stats.high24h || price * 1.035)}
           </div>
         </div>
 
-        <div style={{ background: 'rgba(255,255,255,0.02)', padding: '12px', borderRadius: '10px', border: '1px solid var(--border-subtle)' }}>
+        <div style={{ background: 'var(--bg-input)', padding: '12px', borderRadius: '8px', border: '1px solid var(--border-subtle)', cursor: 'default', minWidth: 0, overflow: 'hidden' }} title="Lowest price recorded in the past 24 hours">
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '4px' }}>
             <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>24h Low</span>
             <ArrowDownRight size={14} color="var(--accent-red)" />
           </div>
-          <div className="mono" style={{ fontSize: '0.95rem', fontWeight: 800, color: 'var(--accent-red)' }}>
+          <div className="mono" style={{ fontSize: '0.95rem', fontWeight: 800, color: 'var(--accent-red)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
             ${formatPrice(stats.low24h || price * 0.965)}
           </div>
         </div>
 
-        <div style={{ background: 'rgba(255,255,255,0.02)', padding: '12px', borderRadius: '10px', border: '1px solid var(--border-subtle)' }}>
+        <div style={{ background: 'var(--bg-input)', padding: '12px', borderRadius: '8px', border: '1px solid var(--border-subtle)', cursor: 'default', minWidth: 0, overflow: 'hidden' }} title={`Orderbook Spread: Best Ask (${formatPrice(stats.ask || price * 1.0005)}) minus Best Bid (${formatPrice(stats.bid || price * 0.9995)})`}>
           <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', display: 'block', marginBottom: '4px' }}>Orderbook Spread</span>
-          <div className="mono" style={{ fontSize: '0.82rem', fontWeight: 600, color: 'var(--text-primary)' }}>
-            {formatPrice(stats.bid || price * 0.9995)} / {formatPrice(stats.ask || price * 1.0005)}
+          <div className="mono" style={{ fontSize: '0.95rem', fontWeight: 800, color: 'var(--text-primary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+            ${formatPrice(Math.abs((stats.ask || price * 1.0005) - (stats.bid || price * 0.9995)))}
           </div>
         </div>
 
-        <div style={{ background: 'rgba(255,255,255,0.02)', padding: '12px', borderRadius: '10px', border: '1px solid var(--border-subtle)' }}>
+        <div style={{ background: 'var(--bg-input)', padding: '12px', borderRadius: '8px', border: '1px solid var(--border-subtle)', cursor: 'default', minWidth: 0, overflow: 'hidden' }} title={`24h Cumulative Trading Volume: ${stats.volume24h ? `${(stats.volume24h / 1000).toFixed(1)}k` : '2.4M'} ${symbol}`}>
           <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', display: 'block', marginBottom: '4px' }}>24h Volume</span>
-          <div className="mono" style={{ fontSize: '0.9rem', fontWeight: 700, color: 'var(--text-secondary)' }}>
-            {stats.volume24h ? `${(stats.volume24h / 1000).toFixed(1)}k ${symbol}` : `2.4M ${symbol}`}
+          <div className="mono" style={{ fontSize: '0.95rem', fontWeight: 800, color: 'var(--text-secondary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+            ${stats.volume24h ? `${(stats.volume24h / 1000).toFixed(1)}k` : '2.4M'}
           </div>
         </div>
 
-        <div style={{ background: 'rgba(255,255,255,0.02)', padding: '12px', borderRadius: '10px', border: '1px solid var(--border-subtle)' }}>
+        <div style={{ background: 'var(--bg-input)', padding: '12px', borderRadius: '8px', border: '1px solid var(--border-subtle)', cursor: 'default', minWidth: 0, overflow: 'hidden' }} title="Defuse Solver: Cross-chain intent execution routing">
           <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', display: 'block', marginBottom: '4px' }}>Defuse Solver Routing</span>
-          <div style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--accent-cyan)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-            {activeToken.blockchain === 'near' ? 'NEP-141 Atomic Solver' : `Chain Signature (${activeToken.blockchain.toUpperCase()})`}
+          <div style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--accent-blue)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+            {activeToken.blockchain === 'near' ? 'NEP-141 Atomic' : 'Chain Signatures'}
           </div>
         </div>
       </div>

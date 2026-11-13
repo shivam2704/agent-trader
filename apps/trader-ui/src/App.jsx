@@ -200,6 +200,7 @@ export default function App() {
           <div>
             <AdminPanel
               config={state.config}
+              marketSymbol={state.market?.symbol}
               agentStatus={state.status}
               lastPayload={state.lastPayload}
               onDispatchPayload={handleDispatchPayload}

@@ -53,20 +53,29 @@ export default function OrderBook({ marketData }) {
   const totalBidH = ROW_COUNT * ROW_H;
 
   return (
-    <div className="glass-panel" style={{ display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+    <div className="glass-panel" style={{ display: 'flex', flexDirection: 'column', overflow: 'hidden', cursor: 'default', userSelect: 'none' }}>
       {/* Header */}
-      <div style={{ padding: '10px 14px', borderBottom: '1px solid var(--border-subtle)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '7px' }}>
+      <div
+        title="Real-time simulated L2 depth & spread around live spot price"
+        style={{ padding: '10px 14px', borderBottom: '1px solid var(--border-subtle)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0, gap: '8px', minWidth: 0 }}
+      >
+        <div style={{ display: 'flex', alignItems: 'center', gap: '7px', flexShrink: 0 }}>
           <BookOpen size={13} color="var(--text-muted)" />
-          <span style={{ fontSize: '0.72rem', fontWeight: 600, color: 'var(--text-secondary)', letterSpacing: '0.05em' }}>ORDER BOOK</span>
+          <span style={{ fontSize: 'var(--text-sm)', fontWeight: 700, color: 'var(--text-secondary)', letterSpacing: '0.05em', whiteSpace: 'nowrap' }}>ORDER BOOK</span>
         </div>
-        <span className="mono" style={{ fontSize: '0.65rem', color: 'var(--text-muted)' }}>{symbol}/USD</span>
+        <span
+          className="mono"
+          title={`${symbol}/USD`}
+          style={{ fontSize: 'var(--text-xs)', color: 'var(--text-muted)', maxWidth: '110px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', textAlign: 'right' }}
+        >
+          {symbol.length > 8 ? `${symbol.slice(0, 6)}…` : symbol}/USD
+        </span>
       </div>
 
       {/* Column labels */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr auto', padding: '4px 14px', borderBottom: '1px solid var(--border-subtle)', flexShrink: 0 }}>
-        <span style={{ fontSize: '0.6rem', color: 'var(--text-muted)', letterSpacing: '0.06em', textTransform: 'uppercase' }}>Price (USD)</span>
-        <span style={{ fontSize: '0.6rem', color: 'var(--text-muted)', letterSpacing: '0.06em', textTransform: 'uppercase' }}>Size</span>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr auto', padding: '5px 14px', borderBottom: '1px solid var(--border-subtle)', flexShrink: 0 }}>
+        <span style={{ fontSize: 'var(--text-xs)', color: 'var(--text-muted)', letterSpacing: '0.06em', textTransform: 'uppercase', fontWeight: 600 }} title="Order price in USD">Price (USD)</span>
+        <span style={{ fontSize: 'var(--text-xs)', color: 'var(--text-muted)', letterSpacing: '0.06em', textTransform: 'uppercase', fontWeight: 600 }} title="Order volume size">Size</span>
       </div>
 
       {/* ASKS — highest price at top, lowest (closest to mid) at bottom */}
@@ -74,20 +83,27 @@ export default function OrderBook({ marketData }) {
         {[...asks].reverse().map((level, i) => {
           const barW = `${((level.size / maxSize) * 100).toFixed(0)}%`;
           return (
-            <div key={`ask-${i}`} style={{ position: 'relative', height: ROW_H, display: 'flex', alignItems: 'center', padding: '0 14px' }}>
+            <div
+              key={`ask-${i}`}
+              title={`Ask (Sell): ${level.size.toLocaleString()} ${symbol} at $${fmt(level.price)}`}
+              style={{ position: 'relative', height: ROW_H, display: 'flex', alignItems: 'center', padding: '0 14px', cursor: 'default' }}
+            >
               <div style={{ position: 'absolute', right: 0, top: 0, bottom: 0, width: barW, background: 'rgba(239,68,68,0.09)', pointerEvents: 'none' }} />
-              <span className="mono" style={{ flex: 1, fontSize: '0.73rem', color: 'var(--accent-red)', position: 'relative', zIndex: 1 }}>{fmt(level.price)}</span>
-              <span className="mono" style={{ fontSize: '0.73rem', color: 'var(--text-secondary)', position: 'relative', zIndex: 1 }}>{level.size.toLocaleString()}</span>
+              <span className="mono" style={{ flex: 1, fontSize: 'var(--text-sm)', color: 'var(--accent-red)', position: 'relative', zIndex: 1, fontWeight: 600 }}>{fmt(level.price)}</span>
+              <span className="mono" style={{ fontSize: 'var(--text-sm)', color: 'var(--text-secondary)', position: 'relative', zIndex: 1 }}>{level.size.toLocaleString()}</span>
             </div>
           );
         })}
       </div>
 
       {/* Spread / Mid price row */}
-      <div style={{ padding: '6px 14px', background: 'rgba(255,255,255,0.03)', borderTop: '1px solid var(--border-subtle)', borderBottom: '1px solid var(--border-subtle)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
-        <span className="mono" style={{ fontSize: '0.82rem', fontWeight: 700, color: 'var(--text-primary)' }}>${fmt(price)}</span>
-        <span style={{ fontSize: '0.63rem', color: 'var(--text-muted)' }}>
-          Spread: <span className="mono" style={{ color: 'var(--accent-amber)' }}>${spread.toFixed(4)}</span>
+      <div
+        title={`Market Spread: Difference between lowest Ask and highest Bid ($${spread.toFixed(4)})`}
+        style={{ padding: '6px 14px', background: 'var(--bg-input)', borderTop: '1px solid var(--border-subtle)', borderBottom: '1px solid var(--border-subtle)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0, cursor: 'default' }}
+      >
+        <span className="mono" style={{ fontSize: 'var(--text-base)', fontWeight: 700, color: 'var(--text-primary)' }}>${fmt(price)}</span>
+        <span style={{ fontSize: 'var(--text-xs)', color: 'var(--text-muted)' }}>
+          Spread: <span className="mono" style={{ color: 'var(--accent-amber)', fontWeight: 700 }}>${spread.toFixed(4)}</span>
         </span>
       </div>
 
@@ -96,10 +112,14 @@ export default function OrderBook({ marketData }) {
         {bids.map((level, i) => {
           const barW = `${((level.size / maxSize) * 100).toFixed(0)}%`;
           return (
-            <div key={`bid-${i}`} style={{ position: 'relative', height: ROW_H, display: 'flex', alignItems: 'center', padding: '0 14px' }}>
+            <div
+              key={`bid-${i}`}
+              title={`Bid (Buy): ${level.size.toLocaleString()} ${symbol} at $${fmt(level.price)}`}
+              style={{ position: 'relative', height: ROW_H, display: 'flex', alignItems: 'center', padding: '0 14px', cursor: 'default' }}
+            >
               <div style={{ position: 'absolute', right: 0, top: 0, bottom: 0, width: barW, background: 'rgba(16,185,129,0.09)', pointerEvents: 'none' }} />
-              <span className="mono" style={{ flex: 1, fontSize: '0.73rem', color: 'var(--accent-green)', position: 'relative', zIndex: 1 }}>{fmt(level.price)}</span>
-              <span className="mono" style={{ fontSize: '0.73rem', color: 'var(--text-secondary)', position: 'relative', zIndex: 1 }}>{level.size.toLocaleString()}</span>
+              <span className="mono" style={{ flex: 1, fontSize: 'var(--text-sm)', color: 'var(--accent-green)', position: 'relative', zIndex: 1, fontWeight: 600 }}>{fmt(level.price)}</span>
+              <span className="mono" style={{ fontSize: 'var(--text-sm)', color: 'var(--text-secondary)', position: 'relative', zIndex: 1 }}>{level.size.toLocaleString()}</span>
             </div>
           );
         })}

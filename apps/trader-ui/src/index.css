@@ -31,48 +31,109 @@
   --shadow-card: 0 1px 3px rgba(0,0,0,0.5);
 }
 
-/* ── LIGHT THEME ──────────────────────────────────── */
+/* ── LIGHT THEME (High-Contrast Institutional Grade) ─── */
 [data-theme="light"] {
-  --bg-primary: #f1f5f9;
+  --bg-primary: #f8fafc;
   --bg-secondary: #ffffff;
-  --bg-card: rgba(255, 255, 255, 0.97);
-  --bg-row-hover: rgba(0, 0, 0, 0.03);
-  --bg-input: rgba(0, 0, 0, 0.04);
+  --bg-card: #ffffff;
+  --bg-row-hover: rgba(0, 0, 0, 0.04);
+  --bg-input: #f1f5f9;
 
-  --border-subtle: rgba(0, 0, 0, 0.09);
-  --border-mid: rgba(0, 0, 0, 0.14);
+  --border-subtle: #e2e8f0;
+  --border-mid: #cbd5e1;
 
-  --accent-blue: #2563eb;
-  --accent-blue-dim: rgba(37, 99, 235, 0.1);
-  --accent-green: #059669;
-  --accent-green-dim: rgba(5, 150, 105, 0.1);
-  --accent-red: #dc2626;
-  --accent-red-dim: rgba(220, 38, 38, 0.1);
-  --accent-amber: #d97706;
-  --accent-amber-dim: rgba(217, 119, 6, 0.1);
-  --accent-cyan: #0284c7;
-  --accent-purple: #7c3aed;
+  --accent-blue: #1d4ed8;
+  --accent-blue-dim: rgba(29, 78, 216, 0.1);
+  --accent-green: #047857;
+  --accent-green-dim: rgba(4, 120, 87, 0.12);
+  --accent-red: #b91c1c;
+  --accent-red-dim: rgba(185, 28, 28, 0.12);
+  --accent-amber: #b45309;
+  --accent-amber-dim: rgba(180, 83, 9, 0.12);
+  --accent-cyan: #0369a1;
+  --accent-purple: #6d28d9;
 
-  --text-primary: #0f172a;
-  --text-secondary: #475569;
-  --text-muted: #94a3b8;
+  --text-primary: #090d16;
+  --text-secondary: #334155;
+  --text-muted: #64748b;
 
-  --shadow-card: 0 1px 4px rgba(0,0,0,0.08);
+  --shadow-card: 0 1px 3px rgba(15, 23, 42, 0.08), 0 1px 2px rgba(15, 23, 42, 0.04);
 }
 
-/* ── BASE RESET ───────────────────────────────────── */
-* { box-sizing: border-box; margin: 0; padding: 0; }
+[data-theme="light"] body {
+  -webkit-font-smoothing: subpixel-antialiased;
+  -moz-osx-font-smoothing: auto;
+}
+
+[data-theme="light"] .mono {
+  font-weight: 600;
+}
+
+[data-theme="light"] input,
+[data-theme="light"] textarea {
+  color: #090d16 !important;
+  font-weight: 550;
+  border-color: #cbd5e1 !important;
+}
+
+[data-theme="light"] input::placeholder {
+  color: #94a3b8;
+}
+
+/* ── TYPOGRAPHY TOKENS (Institutional Precision) ─── */
+:root {
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, 'SF Mono', 'SFMono-Regular', Menlo, Monaco, Consolas, monospace;
+  --font-main: var(--font-sans);
+
+  /* Unified 4-Tier Typographic Scale */
+  --text-xs: 0.69rem;   /* 11px - Micro badges, table headers, secondary captions */
+  --text-sm: 0.75rem;   /* 12px - Buttons, interactive controls, standard labels */
+  --text-base: 0.82rem; /* 13px - Inputs, card headers, primary table values */
+  --text-lg: 0.95rem;   /* 15px - Metric highlights, subheadings */
+  --text-xl: 1.25rem;   /* 20px - Hero spot price display */
+}
+
+/* ── BASE RESET & FONT UNIFICATION ────────────────── */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
 
 body {
   background-color: var(--bg-primary);
   color: var(--text-primary);
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family: var(--font-sans);
   min-height: 100vh;
   overflow-x: hidden;
   transition: background-color 0.2s ease, color 0.2s ease;
+  cursor: default;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-.mono { font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace; }
+/* Strict Font Inheritance for ALL interactive & form elements */
+button, input, select, textarea, optgroup {
+  font-family: inherit;
+  font-feature-settings: inherit;
+}
+
+button, a, [role="button"] {
+  cursor: pointer;
+  user-select: none;
+}
+
+input[type="text"], input[type="number"], input[type="search"], textarea {
+  cursor: text;
+}
+
+/* Unified Monospace & Tabular Figures */
+.mono, code, pre, .data-table {
+  font-family: var(--font-mono) !important;
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: 'tnum' 1;
+}
 
 /* ── PANEL ────────────────────────────────────────── */
 .glass-panel {
@@ -125,15 +186,31 @@ input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin
 input[type=number] { -moz-appearance: textfield; appearance: textfield; }
 
 /* ── DATA TABLE ───────────────────────────────────── */
-.data-table { width: 100%; border-collapse: collapse; font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; }
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: ui-monospace, 'SF Mono', Menlo, Monaco, Consolas, monospace;
+  font-size: 0.76rem;
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: 'tnum' 1;
+}
 .data-table th {
-  text-align: left; padding: 7px 12px;
-  font-size: 0.63rem; font-weight: 600; letter-spacing: 0.07em; text-transform: uppercase;
-  color: var(--text-muted); border-bottom: 1px solid var(--border-subtle); white-space: nowrap;
+  text-align: left;
+  padding: 8px 12px;
+  font-size: 0.63rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  border-bottom: 1px solid var(--border-subtle);
+  white-space: nowrap;
+  user-select: none;
 }
 .data-table td {
-  padding: 9px 12px; border-bottom: 1px solid var(--border-subtle);
-  white-space: nowrap; vertical-align: middle;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--border-subtle);
+  white-space: nowrap;
+  vertical-align: middle;
 }
 .data-table tr:last-child td { border-bottom: none; }
 .data-table tbody tr:hover td { background: var(--bg-row-hover); }

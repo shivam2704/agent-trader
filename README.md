@@ -81,15 +81,56 @@ console.log("Order ID:", data.orderId);
 - **Zero-MEV & Zero AMM Slippage:** Solvers bid off-chain to fill quotes atomically without frontrunning or sandwich attacks.
 - **Omnichain Settlement:** Near-instant execution across Bitcoin, Ethereum, Solana, and Native NEAR assets via NEAR Chain Signatures.
 
-### 4. 🛡️ Hard Stop-Loss Circuit Breaker ("Sb Khali Na Ho Jaye")
+### 4. 🛡️ Architectural Synergy: NEAR Intents Permissioning + ZeroDrain Sentinel
+ZeroDrain is not a walled garden or a rival DEX — it is the **Real-Time Runtime Risk & Circuit-Breaker Sentinel for the NEAR Intents Agent Ecosystem**:
+
+```
+┌────────────────────────────────────────────────────────────────────────────────────────┐
+│                        AGENT INTENT LIFECYCLE ON NEAR                                  │
+└────────────────────────────────────────────────────────────────────────────────────────┘
+
+  [Autonomous AI Agent]
+          │
+          │ 1. Signs Intent using Scoped NEAR Session Key / Allowance
+          ▼
+  ┌─────────────────────────────────────────────────────────┐
+  │  NEAR INTENTS PERMISSIONING (PDP / Session Keys)        │  ◄── STATIC PRE-TRADE POLICY
+  │  • Who can trade? (Agent Public Key)                    │      (Enforces bounds & budgets)
+  │  • What methods? (swap, ft_transfer_call)               │
+  │  • Allowance Cap? (Max allocation per session)          │
+  └───────────────────────────┬─────────────────────────────┘
+                              │
+                              │ 2. Dispatches Execution Intent
+                              ▼
+  ┌─────────────────────────────────────────────────────────┐
+  │  ZeroDrain.AI RUNTIME SENTINEL                          │  ◄── DYNAMIC POST-TRADE DEFENSE
+  │  • Immutable Vault: Locks return_wallet on-chain        │      (Protects active capital)
+  │  • Defuse Solver Route: 1-Click Zero-MEV execution     │
+  │  • 24/7 Mark-to-Market Sentinel: 3s tick evaluation     │
+  │  • Circuit Breaker Trigger: SL / TP / Trailing Ratchet   │
+  └───────────────────────────┬─────────────────────────────┘
+                              │
+                              │ 3. On Breaker Hit: Auto-Settles & Refunds
+                              ▼
+  [Caller Vault / return_wallet on NEAR Testnet]  ◄── 100% Capital + PnL Auto-Returned
+```
+
+| Dimension | NEAR Intents Agent API (Permissioning Layer) | ZeroDrain.AI (Execution & Risk Sentinel) |
+| :--- | :--- | :--- |
+| **Domain** | Pre-Trade Static Authorization | Post-Trade Dynamic Risk Management |
+| **Key Mechanism** | `add_public_key`, Scoped FunctionCall Keys, Allowances | Smart Contract Vault, Real-time Mark-to-Market Oracle Engine |
+| **What It Prevents** | Unauthorized agent actions, rogue contract calls | Capital wipeout from market crashes, unhandled slippage shocks |
+| **Capital Safety** | Limits how much an agent can spend | Guarantees funds return on-chain to `return_wallet` on SL/TP |
+
+### 5. 🛑 Hard Stop-Loss Circuit Breaker ("Sb Khali Na Ho Jaye")
 - Real-time mark-to-market position evaluation every 3 seconds.
 - Instant liquidation and return of remaining capital (~95%) upon Stop-Loss trigger.
 
-### 5. 🌐 200+ Coins Supported
+### 6. 🌐 200+ Coins Supported
 - Dynamically discovers and tracks **207+ tokens** across NEAR Native (wNEAR, USDC, wBTC, REF, SWEAT, BLACKDRAGON), Omnichain Layer-1s (BTC, ETH, SOL, DOGE, XRP, TON, SUI), and Stables.
 - Multi-source oracles with automatic decimal scaling (from $80,000+ BTC to $0.000004 meme tokens).
 
-### 6. 📊 Live Real-Time Multi-Timeframe Charts & WebSockets
+### 7. 📊 Live Real-Time Multi-Timeframe Charts & WebSockets
 - **Timeframes:** `TICK` (3-sec scalping), `1m` (30 min bars), `5m` (trend analysis), and `15m` (macro).
 - Live WebSocket stream (`ws://`) broadcasting order book ticks, mark-to-market PnL, and circuit breaker status.
 

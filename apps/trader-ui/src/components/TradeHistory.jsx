@@ -12,9 +12,9 @@ export default function TradeHistory({ trades = [] }) {
   }
 
   return (
-    <div style={{ overflowX: 'auto' }}>
+    <div style={{ overflowX: 'auto', cursor: 'default', userSelect: 'none' }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 12px', borderBottom: '1px solid var(--border-subtle)', marginBottom: '0' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '7px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '7px' }} title="Historical immutable ledger of settled trades">
           <History size={14} color="var(--text-muted)" />
           <span style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-secondary)', letterSpacing: '0.03em' }}>SETTLED POSITION LEDGER</span>
         </div>
@@ -24,14 +24,14 @@ export default function TradeHistory({ trades = [] }) {
       <table className="data-table">
         <thead>
           <tr>
-            <th>Side</th>
-            <th>Size</th>
-            <th>Entry → Exit</th>
-            <th>Realized PnL</th>
-            <th>Returned To</th>
-            <th>Protocol Fee</th>
-            <th>Trigger</th>
-            <th>On-Chain Proof</th>
+            <th title="Position side: LONG or SHORT">Side</th>
+            <th title="Allocated capital in NEAR">Size</th>
+            <th title="Fill price at entry compared to final exit fill price">Entry → Exit</th>
+            <th title="Realized net profit or loss percentage">Realized PnL</th>
+            <th title="Caller wallet address where funds were remitted on-chain">Returned To</th>
+            <th title="0.15% Protocol fee plus NEAR blockchain gas fee">Protocol Fee</th>
+            <th title="Trigger condition that executed the closure">Trigger</th>
+            <th title="On-chain cryptographic receipt on NearBlocks Explorer">On-Chain Proof</th>
           </tr>
         </thead>
         <tbody>

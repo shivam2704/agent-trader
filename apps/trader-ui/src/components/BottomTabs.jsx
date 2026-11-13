@@ -13,27 +13,31 @@ export default function BottomTabs({ positions, currentPrice, trades, logs, onCl
       icon: <ClipboardList size={13} />,
       label: 'Active Orders',
       badge: positions?.length || 0,
+      tooltip: 'View all concurrent open orders with live mark-to-market PnL and individual Close buttons',
     },
     {
       icon: <BarChart2 size={13} />,
       label: 'Settled History',
+      tooltip: 'Audited ledger of settled trades with on-chain NEAR receipt proofs',
     },
     {
       icon: <Terminal size={13} />,
       label: 'Node Logs',
+      tooltip: 'Real-time execution & solver audit trail streaming from the backend trading node',
     },
   ];
 
   return (
     <div className="glass-panel" style={{ overflow: 'hidden' }}>
       {/* Tab bar */}
-      <div style={{ display: 'flex', borderBottom: '1px solid var(--border-subtle)', background: 'rgba(0,0,0,0.2)' }}>
+      <div style={{ display: 'flex', borderBottom: '1px solid var(--border-subtle)', background: 'var(--bg-input)' }}>
         {tabs.map((tab, i) => {
           const isActive = active === i;
           return (
             <button
               key={i}
               onClick={() => setActive(i)}
+              title={tab.tooltip}
               style={{
                 display: 'flex',
                 alignItems: 'center',
