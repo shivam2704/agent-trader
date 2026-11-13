@@ -16,3 +16,4 @@ jobs:
           echo "Pinging $RENDER_URL to prevent Render free-tier sleep..."
           STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$RENDER_URL" || echo "FAILED")
           echo "Render Health Response Status: $STATUS"
+
