@@ -13,6 +13,7 @@ const agentBrain = require('./agentBrain');
 const nearIntentsEngine = require('./nearIntentsEngine');
 const dbEngine = require('./dbEngine');
 const { validateTradePayload, validateExitPayload, globalAgentErrorHandler, ApiGuardError } = require('./apiGuard');
+const { swaggerSpec, renderSwaggerHtml } = require('./swaggerDoc');
 
 const path = require('path');
 const fs = require('fs');
@@ -43,6 +44,15 @@ const handleHealth = async (req, res) => {
 };
 app.get('/health', handleHealth);
 app.get('/api/health', handleHealth);
+
+// Interactive OpenAPI & Swagger 3.0 Documentation
+app.get(['/docs', '/api/docs'], (req, res) => {
+  res.setHeader('Content-Type', 'text/html');
+  res.send(renderSwaggerHtml());
+});
+app.get('/openapi.json', (req, res) => {
+  res.json(swaggerSpec);
+});
 
 // 2. Real-Time Market Ticker & Indicators
 app.get('/api/market/ticker', async (req, res) => {
@@ -417,7 +427,7 @@ const clientDistPath = path.join(__dirname, '../trader-ui/dist');
 if (fs.existsSync(clientDistPath)) {
   app.use(express.static(clientDistPath));
   app.get('*', (req, res, next) => {
-    if (req.path.startsWith('/api') || req.path.startsWith('/health')) {
+    if (req.path.startsWith('/api') || req.path.startsWith('/health') || req.path.startsWith('/docs') || req.path === '/openapi.json') {
       return next();
     }
     res.sendFile(path.join(clientDistPath, 'index.html'));

@@ -1,6 +1,6 @@
 // frontend/src/components/Navbar.jsx
 import React, { useState } from 'react';
-import { Activity, Cpu, Bot, Check, Copy, ArrowRightLeft, Radio, ShieldCheck, ExternalLink } from 'lucide-react';
+import { Activity, Cpu, Bot, Check, Copy, ArrowRightLeft, Radio, ShieldCheck, ExternalLink, BookOpen } from 'lucide-react';
 
 export default function Navbar({
   marketPrice,
@@ -132,6 +132,31 @@ export default function Navbar({
               zerodrain-relayer-vault.testnet
             </span>
           </div>
+        </a>
+
+        {/* Swagger OpenAPI Docs Link */}
+        <a
+          href="/docs"
+          target="_blank"
+          rel="noopener noreferrer"
+          title="Open Interactive Swagger / OpenAPI Documentation"
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '6px',
+            background: 'rgba(0, 240, 255, 0.12)',
+            border: '1px solid rgba(0, 240, 255, 0.35)',
+            color: '#00f0ff',
+            borderRadius: '8px',
+            padding: '7px 12px',
+            fontSize: '0.75rem',
+            fontWeight: 700,
+            textDecoration: 'none',
+            transition: 'all 0.15s',
+          }}
+        >
+          <BookOpen size={14} />
+          Swagger Docs
         </a>
 
         {/* Copy cURL Quick Action */}
