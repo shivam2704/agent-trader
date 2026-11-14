@@ -1,6 +1,35 @@
 {
   "orders": [
     {
+      "orderId": "ord_1794653631032_ypi89",
+      "callerWallet": "zerodrain-relayer-vault.testnet",
+      "token": "wrap.testnet",
+      "amount": 0.1,
+      "sl": -4.5,
+      "tp": 9,
+      "mode": "TWO_WAY",
+      "status": "IN_POSITION",
+      "entryPrice": 3.3282,
+      "intentQuote": null,
+      "webhookUrl": null,
+      "agentReasoning": "⚡ Algorithmic Entry Executed: Initiated LONG position of 0.1 NEAR on WRAP. Circuit breaker floor anchored at -4.5%, take-profit ceiling at +9%. Routing via Defuse Omnichain Solver Network with Zero-MEV guarantee.",
+      "createdAt": "2026-11-14T10:53:51.032Z",
+      "updatedAt": "2026-11-14T10:53:52.430Z",
+      "vaultArmReceipt": {
+        "success": true,
+        "isLiveOnChain": false,
+        "contractId": "zerodrain-relayer-vault.testnet",
+        "orderId": "ord_1794653631032_ypi89",
+        "depositNear": 0.1,
+        "returnWallet": "zerodrain-relayer-vault.testnet",
+        "txHash": "arm_mock_1794653631033_95acq",
+        "explorerUrl": "https://testnet.nearblocks.io/txns/arm_mock_1794653631033_95acq",
+        "timestamp": 1794653631033
+      },
+      "entryTxHash": "tx_1794653632430_g6ak9xq",
+      "explorerUrl": "https://testnet.nearblocks.io/txns/tx_1794653632430_g6ak9xq"
+    },
+    {
       "orderId": "ord_1794601738366_hy0be",
       "callerWallet": "zerodrain-relayer-vault.testnet",
       "token": "sol.fakes.testnet",
@@ -13,8 +42,8 @@
       "intentQuote": null,
       "webhookUrl": null,
       "agentReasoning": "⚡ Algorithmic Entry Executed: Initiated LONG position of 0.1 NEAR on SOL. Circuit breaker floor anchored at -5%, take-profit ceiling at +10%. Routing via Defuse Omnichain Solver Network with Zero-MEV guarantee.",
-      "createdAt": "2026-11-14T09:59:30.000Z",
-      "updatedAt": "2026-11-14T10:00:00.000Z",
+      "createdAt": "2026-11-14T10:47:38.412Z",
+      "updatedAt": "2026-11-14T10:48:23.412Z",
       "vaultArmReceipt": {
         "success": true,
         "isLiveOnChain": false,
@@ -44,8 +73,8 @@
       "intentQuote": null,
       "webhookUrl": null,
       "agentReasoning": "⚡ Algorithmic Entry Executed: Initiated LONG position of 0.05 NEAR on WRAP. Circuit breaker floor anchored at -5%, take-profit ceiling at +10%. Routing via Defuse Omnichain Solver Network with Zero-MEV guarantee.",
-      "createdAt": "2026-11-14T10:03:30.000Z",
-      "updatedAt": "2026-11-14T10:04:00.000Z",
+      "createdAt": "2026-11-14T09:31:02.819Z",
+      "updatedAt": "2026-11-14T09:31:47.819Z",
       "vaultArmReceipt": {
         "success": true,
         "isLiveOnChain": true,
@@ -75,8 +104,8 @@
       "intentQuote": null,
       "webhookUrl": null,
       "agentReasoning": "⚡ Algorithmic Entry Executed: Initiated LONG position of 1 NEAR on WRAP. Circuit breaker floor anchored at -5%, take-profit ceiling at +10%. Routing via Defuse Omnichain Solver Network with Zero-MEV guarantee.",
-      "createdAt": "2026-11-14T10:07:30.000Z",
-      "updatedAt": "2026-11-14T10:08:00.000Z",
+      "createdAt": "2026-11-14T07:14:27.631Z",
+      "updatedAt": "2026-11-14T07:15:12.631Z",
       "vaultArmReceipt": {
         "success": true,
         "isLiveOnChain": true,
@@ -106,8 +135,8 @@
       "intentQuote": null,
       "webhookUrl": null,
       "agentReasoning": "⚡ Algorithmic Entry Executed: Initiated LONG position of 0.05 NEAR on WRAP. Circuit breaker floor anchored at -4%, take-profit ceiling at +8%. Routing via Defuse Omnichain Solver Network with Zero-MEV guarantee.",
-      "createdAt": "2026-11-14T10:11:30.000Z",
-      "updatedAt": "2026-11-14T10:12:00.000Z",
+      "createdAt": "2026-11-14T04:21:53.104Z",
+      "updatedAt": "2026-11-14T04:22:38.104Z",
       "vaultArmReceipt": {
         "success": true,
         "isLiveOnChain": true,
@@ -137,8 +166,8 @@
       "intentQuote": null,
       "webhookUrl": null,
       "agentReasoning": "⚡ Algorithmic Entry Executed: Initiated LONG position of 0.05 NEAR on WRAP. Circuit breaker floor anchored at -3%, take-profit ceiling at +8%. Routing via Defuse Omnichain Solver Network with Zero-MEV guarantee.",
-      "createdAt": "2026-11-14T10:15:30.000Z",
-      "updatedAt": "2026-11-14T10:16:00.000Z",
+      "createdAt": "2026-11-13T20:14:10.729Z",
+      "updatedAt": "2026-11-13T20:14:55.729Z",
       "entryTxHash": "9UuNoag2DWNHGgwSnThmRAjio8JzcyNAqN6VUNxNsfKK",
       "explorerUrl": "https://testnet.nearblocks.io/txns/8Sy3SwJoWADzWNvgSs5JUtT4mEBn9RKXMPE2tpxA1pMj",
       "settlementId": "stl_1793690169996_uuk1",
@@ -157,8 +186,8 @@
       "intentQuote": null,
       "webhookUrl": null,
       "agentReasoning": "⚡ Algorithmic Entry Executed: Initiated LONG position of 0.05 NEAR on WRAP. Circuit breaker floor anchored at -3%, take-profit ceiling at +8%. Routing via Defuse Omnichain Solver Network with Zero-MEV guarantee.",
-      "createdAt": "2026-11-14T10:19:30.000Z",
-      "updatedAt": "2026-11-14T10:20:00.000Z"
+      "createdAt": "2026-11-13T16:39:34.345Z",
+      "updatedAt": "2026-11-13T16:40:19.345Z"
     },
     {
       "orderId": "ord_1793213003162_tunim",
@@ -173,8 +202,8 @@
       "intentQuote": null,
       "webhookUrl": "https://httpbin.org/post",
       "agentReasoning": "⚡ Algorithmic Entry Executed: Initiated LONG position of 2.5 NEAR on WBTC. Circuit breaker floor anchored at -4.5%, take-profit ceiling at +12%. Routing via Defuse Omnichain Solver Network with Zero-MEV guarantee.",
-      "createdAt": "2026-11-14T10:23:30.000Z",
-      "updatedAt": "2026-11-14T10:24:00.000Z",
+      "createdAt": "2026-11-13T11:04:57.190Z",
+      "updatedAt": "2026-11-13T11:05:42.190Z",
       "entryTxHash": "tx_1793213004474_r63oibm",
       "explorerUrl": "https://testnet.nearblocks.io/txns/return_tx_1793689788704_0sd9x6",
       "settlementId": "stl_1793689788948_6yrm",
@@ -193,8 +222,8 @@
       "intentQuote": null,
       "webhookUrl": null,
       "agentReasoning": "⚡ Algorithmic Entry Executed: Initiated LONG position of 2 NEAR on WETH. Circuit breaker floor anchored at -40%, take-profit ceiling at +99.5%. Routing via Defuse Omnichain Solver Network with Zero-MEV guarantee.",
-      "createdAt": "2026-11-14T10:27:30.000Z",
-      "updatedAt": "2026-11-14T10:28:00.000Z",
+      "createdAt": "2026-11-13T06:18:46.884Z",
+      "updatedAt": "2026-11-13T06:19:31.884Z",
       "entryTxHash": "tx_1793212453770_u0s4hgu",
       "explorerUrl": "https://testnet.nearblocks.io/txns/return_tx_1793712698115_nyy2v8",
       "settlementId": "stl_1793712702540_8f3c",
@@ -213,8 +242,8 @@
       "intentQuote": null,
       "webhookUrl": null,
       "agentReasoning": "⚡ Algorithmic Entry Executed: Initiated LONG position of 2 NEAR on WETH. Circuit breaker floor anchored at -4%, take-profit ceiling at +100%. Routing via Defuse Omnichain Solver Network with Zero-MEV guarantee.",
-      "createdAt": "2026-11-14T10:31:30.000Z",
-      "updatedAt": "2026-11-14T10:32:00.000Z",
+      "createdAt": "2026-11-12T18:51:23.513Z",
+      "updatedAt": "2026-11-12T18:52:08.513Z",
       "entryTxHash": "tx_1793212443371_sjm9sij",
       "explorerUrl": "https://testnet.nearblocks.io/txns/return_tx_1793689788962_drz548",
       "settlementId": "stl_1793689788962_kz2e",
@@ -233,8 +262,8 @@
       "intentQuote": null,
       "webhookUrl": "https://httpbin.org/post",
       "agentReasoning": "⚡ Algorithmic Entry Executed: Initiated LONG position of 2 NEAR on WETH. Circuit breaker floor anchored at -4%, take-profit ceiling at +8%. Routing via Defuse Omnichain Solver Network with Zero-MEV guarantee.",
-      "createdAt": "2026-11-14T10:35:30.000Z",
-      "updatedAt": "2026-11-14T10:36:00.000Z",
+      "createdAt": "2026-11-12T13:27:59.201Z",
+      "updatedAt": "2026-11-12T13:28:44.201Z",
       "entryTxHash": "tx_1793212073658_z8p5rsl",
       "explorerUrl": "https://testnet.nearblocks.io/txns/return_tx_1793212109751_fksx6n",
       "settlementId": "stl_1793212109751_lxcn",
@@ -253,8 +282,8 @@
       "intentQuote": null,
       "webhookUrl": "https://httpbin.org/post",
       "agentReasoning": "⚡ Algorithmic Entry Executed: Initiated LONG position of 3 NEAR on WBTC. Circuit breaker floor anchored at -5%, take-profit ceiling at +10%. Routing via Defuse Omnichain Solver Network with Zero-MEV guarantee.",
-      "createdAt": "2026-11-14T10:39:30.000Z",
-      "updatedAt": "2026-11-14T10:40:00.000Z",
+      "createdAt": "2026-11-12T08:13:34.670Z",
+      "updatedAt": "2026-11-12T08:14:19.670Z",
       "entryTxHash": "tx_1793212066791_e7xlarh",
       "explorerUrl": "https://testnet.nearblocks.io/txns/return_tx_1793212097757_i96eav",
       "settlementId": "stl_1793212097757_62we",
@@ -273,8 +302,8 @@
       "intentQuote": null,
       "webhookUrl": "https://httpbin.org/post",
       "agentReasoning": "⚡ Algorithmic Entry Executed: Initiated LONG position of 2 NEAR on WETH. Circuit breaker floor anchored at -4%, take-profit ceiling at +8%. Routing via Defuse Omnichain Solver Network with Zero-MEV guarantee.",
-      "createdAt": "2026-11-14T10:43:30.000Z",
-      "updatedAt": "2026-11-14T10:44:00.000Z",
+      "createdAt": "2026-11-11T19:43:07.418Z",
+      "updatedAt": "2026-11-11T19:43:52.418Z",
       "entryTxHash": "tx_1793211966135_4ulwyhk",
       "explorerUrl": "https://testnet.nearblocks.io/txns/return_tx_1793211970700_i3aiij",
       "settlementId": "stl_1793211970701_wz6y",
@@ -293,8 +322,8 @@
       "intentQuote": null,
       "webhookUrl": "https://httpbin.org/post",
       "agentReasoning": "⚡ Algorithmic Entry Executed: Initiated LONG position of 3 NEAR on WBTC. Circuit breaker floor anchored at -5%, take-profit ceiling at +10%. Routing via Defuse Omnichain Solver Network with Zero-MEV guarantee.",
-      "createdAt": "2026-11-14T10:47:30.000Z",
-      "updatedAt": "2026-11-14T10:48:00.000Z",
+      "createdAt": "2026-11-11T14:10:21.902Z",
+      "updatedAt": "2026-11-11T14:11:06.902Z",
       "entryTxHash": "tx_1793211959179_5vdeic0",
       "explorerUrl": "https://testnet.nearblocks.io/txns/return_tx_1793211962601_ij4jrc",
       "settlementId": "stl_1793211962603_qj5f",
@@ -311,8 +340,8 @@
       "status": "SETTLED",
       "entryPrice": 4.6128,
       "intentQuote": null,
-      "createdAt": "2026-11-14T10:51:30.000Z",
-      "updatedAt": "2026-11-14T10:52:00.000Z",
+      "createdAt": "2026-11-11T09:29:36.115Z",
+      "updatedAt": "2026-11-11T09:30:21.115Z",
       "entryTxHash": "tx_1793211199579_u2peii5",
       "explorerUrl": "https://testnet.nearblocks.io/txns/return_tx_1793211217347_nan4mh",
       "settlementId": "stl_1793211217349_0i44",
@@ -331,7 +360,7 @@
       "pnlPercent": -5.39,
       "agentReasoning": "🛑 Circuit Breaker Hard Trigger: Net mark-to-market drawdown breached risk threshold (-5.39% <= -5%). Market volatility triggered immediate liquidation to preserve 94.6% of allocated capital. Return settlement atomically routed on-chain to zerodrain-relayer-vault.testnet.",
       "webhookDelivered": false,
-      "settledAt": "2026-11-14T10:00:00.000Z"
+      "settledAt": "2026-11-14T10:48:23.412Z"
     },
     {
       "settlementId": "stl_1793712807579_5ty3",
@@ -344,7 +373,7 @@
       "pnlPercent": 0,
       "agentReasoning": "⚡ Programmatic Agent Exit: Caller wallet zerodrain-relayer-vault.testnet requested early position close. Net realized PnL: 0%. Funds returned on-chain.",
       "webhookDelivered": false,
-      "settledAt": "2026-11-14T10:04:00.000Z"
+      "settledAt": "2026-11-14T09:31:47.819Z"
     },
     {
       "settlementId": "stl_1793712713074_kjkr",
@@ -357,7 +386,7 @@
       "pnlPercent": 0.12,
       "agentReasoning": "⚡ Programmatic Agent Exit: Caller wallet 0x71c8418c204d23791f requested early position close. Net realized PnL: 0.12%. Funds returned on-chain.",
       "webhookDelivered": false,
-      "settledAt": "2026-11-14T10:08:00.000Z"
+      "settledAt": "2026-11-14T07:15:12.631Z"
     },
     {
       "settlementId": "stl_1793712702540_8f3c",
@@ -370,7 +399,7 @@
       "pnlPercent": -2.68,
       "agentReasoning": "⚡ Programmatic Agent Exit: Caller wallet agent_beta.testnet requested early position close. Net realized PnL: -2.68%. Funds returned on-chain.",
       "webhookDelivered": false,
-      "settledAt": "2026-11-14T10:12:00.000Z"
+      "settledAt": "2026-11-14T04:22:38.104Z"
     },
     {
       "settlementId": "stl_1793694475058_jty7",
@@ -383,7 +412,7 @@
       "pnlPercent": -0.09,
       "agentReasoning": "⚡ Programmatic Agent Exit: Caller wallet zerodrain-relayer-vault.testnet requested early position close. Net realized PnL: -0.09%. Funds returned on-chain.",
       "webhookDelivered": false,
-      "settledAt": "2026-11-14T10:16:00.000Z"
+      "settledAt": "2026-11-13T20:14:55.729Z"
     },
     {
       "settlementId": "stl_1793690169996_uuk1",
@@ -396,7 +425,7 @@
       "pnlPercent": 0.02,
       "agentReasoning": "⚡ Programmatic Agent Exit: Caller wallet zerodrain-relayer-vault.testnet requested early position close. Net realized PnL: 0%. Funds returned on-chain.",
       "webhookDelivered": false,
-      "settledAt": "2026-11-14T10:20:00.000Z"
+      "settledAt": "2026-11-13T16:40:19.345Z"
     },
     {
       "settlementId": "stl_1793689788962_kz2e",
@@ -409,7 +438,7 @@
       "pnlPercent": -4.28,
       "agentReasoning": "🛑 Circuit Breaker Hard Trigger: Net mark-to-market drawdown breached risk threshold (-4.28% <= -4%). Market volatility triggered immediate liquidation to preserve 95.7% of allocated capital. Return settlement atomically routed on-chain to agent_beta.testnet.",
       "webhookDelivered": false,
-      "settledAt": "2026-11-14T10:24:00.000Z"
+      "settledAt": "2026-11-13T11:05:42.190Z"
     },
     {
       "settlementId": "stl_1793689788948_6yrm",
@@ -422,7 +451,7 @@
       "pnlPercent": -5.73,
       "agentReasoning": "🛑 Circuit Breaker Hard Trigger: Net mark-to-market drawdown breached risk threshold (-5.73% <= -4.5%). Market volatility triggered immediate liquidation to preserve 94.3% of allocated capital. Return settlement atomically routed on-chain to agent_alpha.testnet.",
       "webhookDelivered": false,
-      "settledAt": "2026-11-14T10:28:00.000Z"
+      "settledAt": "2026-11-13T06:19:31.884Z"
     },
     {
       "settlementId": "stl_1793212109751_lxcn",
@@ -435,7 +464,7 @@
       "pnlPercent": 0,
       "agentReasoning": "⚡ Programmatic Agent Exit: Caller wallet agent_beta.testnet requested early position close. Net realized PnL: 0%. Funds returned on-chain.",
       "webhookDelivered": false,
-      "settledAt": "2026-11-14T10:32:00.000Z"
+      "settledAt": "2026-11-12T18:52:08.513Z"
     },
     {
       "settlementId": "stl_1793212097757_62we",
@@ -448,7 +477,7 @@
       "pnlPercent": 0.03,
       "agentReasoning": "⚡ Programmatic Agent Exit: Caller wallet agent_alpha.testnet requested early position close. Net realized PnL: 0.03%. Funds returned on-chain.",
       "webhookDelivered": false,
-      "settledAt": "2026-11-14T10:36:00.000Z"
+      "settledAt": "2026-11-12T13:28:44.201Z"
     },
     {
       "settlementId": "stl_1793211970701_wz6y",
@@ -461,7 +490,7 @@
       "pnlPercent": 50714.63,
       "agentReasoning": "🎯 Take Profit Target Realized: Upside gain target achieved (+50714.63% >= +8%). Exact-output swap settled via Defuse Omnichain Solvers; locked principal and profit returned directly to agent_beta.testnet.",
       "webhookDelivered": false,
-      "settledAt": "2026-11-14T10:40:00.000Z"
+      "settledAt": "2026-11-12T08:14:19.670Z"
     },
     {
       "settlementId": "stl_1793211962603_qj5f",
@@ -474,7 +503,7 @@
       "pnlPercent": 1752949.56,
       "agentReasoning": "🎯 Take Profit Target Realized: Upside gain target achieved (+1752949.56% >= +10%). Exact-output swap settled via Defuse Omnichain Solvers; locked principal and profit returned directly to agent_alpha.testnet.",
       "webhookDelivered": false,
-      "settledAt": "2026-11-14T10:44:00.000Z"
+      "settledAt": "2026-11-11T19:43:52.418Z"
     },
     {
       "settlementId": "stl_1793211217349_0i44",
@@ -485,7 +514,7 @@
       "returnTxHash": "return_tx_1793211217347_nan4mh",
       "explorerUrl": "https://testnet.nearblocks.io/txns/return_tx_1793211217347_nan4mh",
       "pnlPercent": 0,
-      "settledAt": "2026-11-14T10:48:00.000Z"
+      "settledAt": "2026-11-11T14:11:06.902Z"
     }
   ],
   "trades": [
@@ -510,7 +539,7 @@
       "entryTxHash": "tx_1794601739851_i0mxbvn",
       "exitTxHash": "tx_1794622984915_wdpo4c8",
       "explorerUrl": "https://testnet.nearblocks.io/txns/tx_1794622984915_wdpo4c8",
-      "timestamp": "2026-11-14T10:00:00.000Z"
+      "timestamp": "2026-11-14T10:48:23.412Z"
     },
     {
       "id": "trade_1793712807578",
@@ -533,7 +562,7 @@
       "entryTxHash": "9CjNraEMh6JZSj6vjADrANkmxXLYCiYGSUhbKC3VR7wB",
       "exitTxHash": "GamW6njanm4aes1i6aNcY8zEje35DKN6dC9eJhigGJwM",
       "explorerUrl": "https://testnet.nearblocks.io/txns/GamW6njanm4aes1i6aNcY8zEje35DKN6dC9eJhigGJwM",
-      "timestamp": "2026-11-14T10:04:00.000Z"
+      "timestamp": "2026-11-14T09:31:47.819Z"
     },
     {
       "id": "trade_1793712713074",
@@ -556,7 +585,7 @@
       "entryTxHash": "tx_1793712638344_ko821xe",
       "exitTxHash": "tx_1793712713074_v52t12k",
       "explorerUrl": "https://testnet.nearblocks.io/txns/tx_1793712713074_v52t12k",
-      "timestamp": "2026-11-14T10:08:00.000Z"
+      "timestamp": "2026-11-14T07:15:12.631Z"
     },
     {
       "id": "trade_1793712702540",
@@ -579,7 +608,7 @@
       "entryTxHash": "tx_1793212453770_u0s4hgu",
       "exitTxHash": "tx_1793712702539_vibc7so",
       "explorerUrl": "https://testnet.nearblocks.io/txns/tx_1793712702539_vibc7so",
-      "timestamp": "2026-11-14T10:12:00.000Z"
+      "timestamp": "2026-11-14T04:22:38.104Z"
     },
     {
       "id": "trade_1793694475057",
@@ -602,7 +631,7 @@
       "entryTxHash": "3ewn8AsFWbjwRtPRzit7J8wnBJe3776xLEv1aMrLqedC",
       "exitTxHash": "FixmxjeKjAWyXkT5y98MoDhdq9a7L9K1jTEqN9zwDgnc",
       "explorerUrl": "https://testnet.nearblocks.io/txns/FixmxjeKjAWyXkT5y98MoDhdq9a7L9K1jTEqN9zwDgnc",
-      "timestamp": "2026-11-14T10:16:00.000Z"
+      "timestamp": "2026-11-13T20:14:55.729Z"
     },
     {
       "id": "trade_1793690169996",
@@ -625,7 +654,7 @@
       "entryTxHash": "9UuNoag2DWNHGgwSnThmRAjio8JzcyNAqN6VUNxNsfKK",
       "exitTxHash": "tx_1793690169996_rzlb8sm",
       "explorerUrl": "https://testnet.nearblocks.io/txns/tx_1793690169996_rzlb8sm",
-      "timestamp": "2026-11-14T10:20:00.000Z"
+      "timestamp": "2026-11-13T16:40:19.345Z"
     },
     {
       "id": "trade_1793689788962",
@@ -648,7 +677,7 @@
       "entryTxHash": "tx_1793212443371_sjm9sij",
       "exitTxHash": "tx_1793689788962_c89v84r",
       "explorerUrl": "https://testnet.nearblocks.io/txns/tx_1793689788962_c89v84r",
-      "timestamp": "2026-11-14T10:24:00.000Z"
+      "timestamp": "2026-11-13T11:05:42.190Z"
     },
     {
       "id": "trade_1793689788948",
@@ -671,7 +700,7 @@
       "entryTxHash": "tx_1793213004474_r63oibm",
       "exitTxHash": "tx_1793689788947_3y8yexq",
       "explorerUrl": "https://testnet.nearblocks.io/txns/tx_1793689788947_3y8yexq",
-      "timestamp": "2026-11-14T10:28:00.000Z"
+      "timestamp": "2026-11-13T06:19:31.884Z"
     },
     {
       "id": "trade_1793212109751",
@@ -694,7 +723,7 @@
       "entryTxHash": "tx_1793212073658_z8p5rsl",
       "exitTxHash": "tx_1793212109751_6g0cphp",
       "explorerUrl": "https://testnet.nearblocks.io/txns/tx_1793212109751_6g0cphp",
-      "timestamp": "2026-11-14T10:32:00.000Z"
+      "timestamp": "2026-11-12T18:52:08.513Z"
     },
     {
       "id": "trade_1793212097757",
@@ -717,7 +746,7 @@
       "entryTxHash": "tx_1793212066791_e7xlarh",
       "exitTxHash": "tx_1793212097757_ulnpptr",
       "explorerUrl": "https://testnet.nearblocks.io/txns/tx_1793212097757_ulnpptr",
-      "timestamp": "2026-11-14T10:36:00.000Z"
+      "timestamp": "2026-11-12T13:28:44.201Z"
     },
     {
       "id": "trade_1793211970701",
@@ -740,7 +769,7 @@
       "entryTxHash": "tx_1793211966135_4ulwyhk",
       "exitTxHash": "tx_1793211970701_lqcm1fd",
       "explorerUrl": "https://testnet.nearblocks.io/txns/tx_1793211970701_lqcm1fd",
-      "timestamp": "2026-11-14T10:40:00.000Z"
+      "timestamp": "2026-11-12T08:14:19.670Z"
     },
     {
       "id": "trade_1793211962603",
@@ -763,7 +792,7 @@
       "entryTxHash": "tx_1793211959179_5vdeic0",
       "exitTxHash": "tx_1793211962603_owtd282",
       "explorerUrl": "https://testnet.nearblocks.io/txns/tx_1793211962603_owtd282",
-      "timestamp": "2026-11-14T10:44:00.000Z"
+      "timestamp": "2026-11-11T19:43:52.418Z"
     },
     {
       "id": "trade_1793211217349",
@@ -784,12 +813,12 @@
       "entryTxHash": "tx_1793211199579_u2peii5",
       "exitTxHash": "tx_1793211217349_832qi5j",
       "explorerUrl": "https://testnet.nearblocks.io/txns/tx_1793211217349_832qi5j",
-      "timestamp": "2026-11-14T10:48:00.000Z"
+      "timestamp": "2026-11-11T14:11:06.902Z"
     }
   ],
   "metadata": {
     "version": "1.0.0",
     "created": "2026-10-28T18:13:00.837Z",
-    "lastUpdated": "2026-11-14T10:48:42.520Z"
+    "lastUpdated": "2026-11-14T10:53:52.430Z"
   }
 }
