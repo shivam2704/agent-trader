@@ -7,6 +7,7 @@
     "apps/*"
   ],
   "scripts": {
+    "start": "node apps/agent-core/server.js",
     "start:agent": "npm run start --workspace=@zerodrain/agent-core",
     "dev:agent": "npm run dev --workspace=@zerodrain/agent-core",
     "dev:ui": "npm run dev --workspace=@zerodrain/trader-ui",

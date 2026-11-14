@@ -10,6 +10,7 @@ export default function AdminPanel({
   onCloseAndReturn,
   lastPayload,
   onSelectToken,
+  onConfigChange,
 }) {
   const [wallet, setWallet] = useState(config?.wallet || config?.accountId || '');
   const [token, setToken] = useState(config.tokenPair || 'wrap.testnet');
@@ -25,6 +26,18 @@ export default function AdminPanel({
   const [intentPreview, setIntentPreview] = useState(null);
   const [fetchingQuote, setFetchingQuote] = useState(false);
   const initializedRef = React.useRef(false);
+
+  // Notify parent of user-configured SL/TP/amount edits for live on-chart ghost preview
+  useEffect(() => {
+    if (onConfigChange) {
+      onConfigChange({
+        stopLossPercent: -Math.abs(parseFloat(sl) || 5.0),
+        takeProfitPercent: +(parseFloat(tp) || 10.0),
+        allocation: +(parseFloat(amount) || 1.0),
+        wallet,
+      });
+    }
+  }, [sl, tp, amount, wallet, onConfigChange]);
 
   // Sync initial config from server once on load without overriding active user edits on every tick
   useEffect(() => {

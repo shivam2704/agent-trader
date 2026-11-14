@@ -77,15 +77,15 @@ app.get(['/api/market/tokens', '/v1/tokens'], (req, res) => {
   });
 });
 
-// 2.15 Multi-timeframe market history (TICK, 1m, 5m, 15m)
-app.get('/api/market/history', (req, res) => {
+// 2.15 Multi-timeframe market history (TICK, 1m, 5m, 15m, 1h, 1D) with real Binance Vision klines
+app.get('/api/market/history', async (req, res) => {
   const { symbol, timeframe } = req.query;
-  const history = marketEngine.getTimeframeHistory(symbol || marketEngine.symbol, timeframe || '1m');
+  const klineData = await marketEngine.fetchKlines(symbol || marketEngine.symbol, timeframe || '1m');
   res.json({
     success: true,
     symbol: symbol || marketEngine.symbol,
     timeframe: timeframe || '1m',
-    history,
+    ...klineData,
   });
 });
 
@@ -386,6 +386,7 @@ app.get('/api/agent/settlements', (req, res) => {
 // 4.5 Reset / Clear Historical Ledger (Clean slate)
 app.post('/api/agent/reset-ledger', (req, res) => {
   dbEngine.clear();
+  agentBrain.positions.clear();
   agentBrain.tradeHistory = [];
   agentBrain.feeStats.totalFeesPaidNear = 0;
   agentBrain.feeStats.totalFeesPaidUsd = 0;

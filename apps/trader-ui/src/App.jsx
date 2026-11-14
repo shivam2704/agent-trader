@@ -7,8 +7,24 @@ import IndicatorGauges from './components/IndicatorGauges';
 import OrderBook from './components/OrderBook';
 import BottomTabs from './components/BottomTabs';
 
+const CANONICAL_TESTNET_CONTRACTS = {
+  NEAR: 'wrap.testnet',
+  WNEAR: 'wrap.testnet',
+  WRAP: 'wrap.testnet',
+  ETH: 'weth.fakes.testnet',
+  WETH: 'weth.fakes.testnet',
+  BTC: 'wbtc.fakes.testnet',
+  WBTC: 'wbtc.fakes.testnet',
+  SOL: 'sol.fakes.testnet',
+  USDC: 'usdc.fakes.testnet',
+  USDT: 'usdt.fakes.testnet',
+  DOGE: 'doge.omft.near',
+  AURORA: 'aurora.fakes.testnet',
+};
+
 export default function App() {
   const [theme, setTheme] = useState(() => localStorage.getItem('zd_theme') || 'dark');
+  const [isOrderBookCollapsed, setIsOrderBookCollapsed] = useState(false);
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
@@ -151,16 +167,17 @@ export default function App() {
   const handleSwitchToken = async (tokenObj) => {
     try {
       const sym = typeof tokenObj === 'string' ? tokenObj : tokenObj.symbol;
-      const contract = tokenObj.testnetContract || tokenObj.contractId || sym;
+      const upperSym = (sym || 'NEAR').toUpperCase();
+      const canonicalContract = CANONICAL_TESTNET_CONTRACTS[upperSym] || tokenObj.testnetContract || tokenObj.contractId || sym;
       const res = await fetch('/api/market/switch-token', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ symbol: sym, token: contract }),
+        body: JSON.stringify({ symbol: sym, token: canonicalContract }),
       });
       const data = await res.json();
       setState((prev) => ({
         ...prev,
-        config: { ...prev.config, tokenPair: contract },
+        config: { ...prev.config, tokenPair: canonicalContract },
         market: data || prev.market,
       }));
     } catch (err) {
@@ -193,7 +210,17 @@ export default function App() {
       <main style={{ flex: 1, padding: '0 16px 32px', maxWidth: '1600px', margin: '0 auto', width: '100%', boxSizing: 'border-box' }}>
 
         {/* Top row: Left sidebar + Chart + Order Book */}
-        <div style={{ display: 'grid', gridTemplateColumns: '360px minmax(0,1fr) 260px', gap: '16px', alignItems: 'start' }}>
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: isOrderBookCollapsed
+              ? '360px minmax(0, 1fr) 42px'
+              : '360px minmax(0, 1fr) 260px',
+            gap: '16px',
+            alignItems: 'start',
+            transition: 'grid-template-columns 0.2s ease',
+          }}
+        >
 
           {/* Left — Agent API panel */}
           <div>
@@ -205,12 +232,25 @@ export default function App() {
               onDispatchPayload={handleDispatchPayload}
               onCloseAndReturn={handleCloseAndReturn}
               onSelectToken={handleSwitchToken}
+              onConfigChange={(newCfg) => {
+                setState((prev) => ({
+                  ...prev,
+                  config: { ...prev.config, ...newCfg },
+                }));
+              }}
             />
           </div>
 
-          {/* Center — Chart + Indicators */}
+          {/* Center — Chart + Indicators + Sentinel Telemetry */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '14px', minWidth: 0 }}>
-            <LiveChart marketData={state.market} onSelectToken={handleSwitchToken} />
+            <LiveChart
+              marketData={state.market}
+              onSelectToken={handleSwitchToken}
+              activePositions={activePositions}
+              pendingConfig={state.config}
+              onToggleOrderBook={() => setIsOrderBookCollapsed((prev) => !prev)}
+              isOrderBookCollapsed={isOrderBookCollapsed}
+            />
             <IndicatorGauges
               indicators={state.market?.indicators}
               signal={state.market?.signal}
@@ -220,7 +260,11 @@ export default function App() {
 
           {/* Right — Order Book */}
           <div style={{ height: '100%', minHeight: '480px' }}>
-            <OrderBook marketData={state.market} />
+            <OrderBook
+              marketData={state.market}
+              isCollapsed={isOrderBookCollapsed}
+              onToggleCollapse={() => setIsOrderBookCollapsed((prev) => !prev)}
+            />
           </div>
         </div>
 

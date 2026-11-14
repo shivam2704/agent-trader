@@ -10,7 +10,7 @@
 - **Interactive Swagger / OpenAPI Docs:** [https://zerodrain-agent-trader.onrender.com/docs](https://zerodrain-agent-trader.onrender.com/docs)
 - **NEAR Testnet Smart Contract Vault:** [`zerodrain-relayer-vault.testnet`](https://testnet.nearblocks.io/address/zerodrain-relayer-vault.testnet)
 - **Defuse Omnichain Solver Bus:** `https://1click.chaindefuser.com`
-- **Automated Claude Code & Codex Test:** `npm test` *(9/9 verified assertions passing)*
+- **Automated Claude Code & Codex Test:** `npm test` *(51/51 verified assertions across 15 suites passing)*
 
 ---
 

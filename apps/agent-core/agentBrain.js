@@ -236,14 +236,15 @@ class AgentBrain {
     const cleanTrailingStop = Boolean(trailingStop === true || trailingStop === 'true');
     const cleanMaxTrades = Math.max(1, parseInt(maxTrades) || 1);
 
-    // Normalize common token symbols to NEAR testnet NEP-141 contracts
+    // Normalize common token symbols and raw bridge hashes to NEAR testnet NEP-141 contracts
     let tokenContract = token.trim();
     const tokenUpper = tokenContract.toUpperCase();
-    if (tokenUpper === 'NEAR' || tokenUpper === 'WNEAR') tokenContract = 'wrap.testnet';
-    else if (tokenUpper === 'ETH' || tokenUpper === 'WETH') tokenContract = 'weth.fakes.testnet';
-    else if (tokenUpper === 'BTC' || tokenUpper === 'WBTC') tokenContract = 'wbtc.fakes.testnet';
-    else if (tokenUpper === 'SOL') tokenContract = 'sol.fakes.testnet';
-    else if (tokenUpper === 'USDC') tokenContract = 'usdc.fakes.testnet';
+    if (tokenUpper === 'NEAR' || tokenUpper === 'WNEAR' || tokenUpper === 'WRAP') tokenContract = 'wrap.testnet';
+    else if (tokenUpper === 'ETH' || tokenUpper === 'WETH' || tokenUpper.includes('ETH.BRIDGE.NEAR')) tokenContract = 'weth.fakes.testnet';
+    else if (tokenUpper === 'BTC' || tokenUpper === 'WBTC' || tokenUpper.includes('2260FAC5') || tokenUpper.includes('BTC.OMFT.NEAR')) tokenContract = 'wbtc.fakes.testnet';
+    else if (tokenUpper === 'SOL' || tokenUpper.includes('SOL.OMFT.NEAR')) tokenContract = 'sol.fakes.testnet';
+    else if (tokenUpper === 'USDC' || tokenUpper.includes('17208628')) tokenContract = 'usdc.fakes.testnet';
+    else if (tokenUpper === 'USDT' || tokenUpper.includes('USDT.TETHER')) tokenContract = 'usdt.fakes.testnet';
     else if (tokenUpper === 'AURORA') tokenContract = 'aurora.fakes.testnet';
 
     const orderId = `ord_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;

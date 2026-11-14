@@ -116,3 +116,4 @@ describe('Suite 3: Trailing Stop-Loss Ratchet Monotonicity', () => {
     assert.strictEqual(t4.shouldLiquidate, true); // Trailing SL successfully protected profit!
   });
 });
+

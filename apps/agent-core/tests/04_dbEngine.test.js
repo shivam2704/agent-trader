@@ -75,3 +75,4 @@ describe('Suite 1: Order Lifecycle & Wallet Indexing in DB Engine', () => {
     assert.ok(allTrades.some((t) => t.orderId === orderId));
   });
 });
+

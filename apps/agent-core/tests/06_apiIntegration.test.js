@@ -52,6 +52,10 @@ describe('Suite 1: Liveness, Health & Metadata Routes', () => {
 });
 
 describe('Suite 2: Machine-Readable Agent Trade Gateway Endpoints', () => {
+  before(async () => {
+    await fetch(`${baseUrl}/api/agent/reset-ledger`, { method: 'POST' });
+  });
+
   it('POST /api/agent/trade with valid payload creates order and arms vault', async () => {
     const payload = {
       token: 'wrap.testnet',

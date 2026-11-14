@@ -106,3 +106,4 @@ describe('Suite 2: Concurrency Lock & Re-entrancy Protection', () => {
     assert.strictEqual(dbEngine.getSettlementByOrder(orderId).settlementId, firstSave.settlementId);
   });
 });
+
