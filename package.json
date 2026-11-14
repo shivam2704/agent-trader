@@ -12,7 +12,7 @@
     "dev:ui": "npm run dev --workspace=@zerodrain/trader-ui",
     "build:ui": "npm run build --workspace=@zerodrain/trader-ui",
     "build": "npm run build:ui",
-    "test": "node apps/agent-core/test/system.test.js"
+    "test": "node --test apps/agent-core/tests/*.test.js"
   },
   "keywords": [
     "near-protocol",

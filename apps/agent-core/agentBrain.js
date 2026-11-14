@@ -111,6 +111,7 @@ class AgentBrain {
         console.log(`🔄 Rehydrated ${this.positions.size} active trading position(s) from persistent DB.`);
         if (!this.timer) {
           this.timer = setInterval(() => this.heartbeat(), this.pollIntervalMs);
+          if (this.timer && this.timer.unref) this.timer.unref();
         }
       }
     } catch (e) {
@@ -388,6 +389,7 @@ class AgentBrain {
     // Ensure autonomous monitoring loop is active
     if (!this.timer) {
       this.timer = setInterval(() => this.heartbeat(), this.pollIntervalMs);
+      if (this.timer && this.timer.unref) this.timer.unref();
     }
     this.broadcast();
 
@@ -445,6 +447,7 @@ class AgentBrain {
 
     if (this.timer) clearInterval(this.timer);
     this.timer = setInterval(() => this.heartbeat(), this.pollIntervalMs);
+    if (this.timer && this.timer.unref) this.timer.unref();
   }
 
   stop() {

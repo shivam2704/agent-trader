@@ -36,7 +36,7 @@ class MarketEngine {
   constructor() {
     this.symbol = 'NEAR';
     this.maxHistory = 100;
-    this.supportedTokens = [];
+    this.supportedTokens = this.getDefaultTokens();
     this.tokenHistories = {};
     this.tokenStats = {};
     this.isLoaded = false;

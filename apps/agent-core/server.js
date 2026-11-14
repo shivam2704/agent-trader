@@ -504,12 +504,13 @@ agentBrain.onUpdate((state) => {
 });
 
 // Start continuous market polling ticker in background (every 3 seconds)
-setInterval(async () => {
+const backgroundTicker = setInterval(async () => {
   await marketEngine.updateMarketPrice();
   if (agentBrain.status !== 'SCANNING' && agentBrain.status !== 'IN_POSITION') {
     agentBrain.broadcast();
   }
 }, 3000);
+if (backgroundTicker.unref) backgroundTicker.unref();
 
 // Serve static Trader UI files when deployed as a unified single-service container
 const clientDistPath = path.join(__dirname, '../trader-ui/dist');
@@ -526,7 +527,11 @@ if (fs.existsSync(clientDistPath)) {
 // Global Express Error Handling Middleware for Autonomous AI Agents
 app.use(globalAgentErrorHandler);
 
-server.listen(PORT, () => {
-  console.log(`🚀 ZeroDrain Backend Server running on http://localhost:${PORT}`);
-  console.log(`⚡ WebSocket Stream active on ws://localhost:${PORT}`);
-});
+if (require.main === module) {
+  server.listen(PORT, () => {
+    console.log(`🚀 ZeroDrain Backend Server running on http://localhost:${PORT}`);
+    console.log(`⚡ WebSocket Stream active on ws://localhost:${PORT}`);
+  });
+}
+
+module.exports = { app, server };

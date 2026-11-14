@@ -1,23 +1,82 @@
 {
-  "orders": [],
+  "orders": [
+    {
+      "orderId": "ord_1794671562648_az1ap",
+      "callerWallet": "integration_tester.testnet",
+      "token": "wrap.testnet",
+      "amount": 0.1,
+      "sl": -5,
+      "tp": 10,
+      "mode": "TWO_WAY",
+      "status": "IN_POSITION",
+      "entryPrice": 3.21,
+      "intentQuote": null,
+      "webhookUrl": null,
+      "agentReasoning": "⚡ Algorithmic Entry Executed: Initiated LONG position of 0.1 NEAR on WRAP. Circuit breaker floor anchored at -5%, take-profit ceiling at +10%. Routing via Defuse Omnichain Solver Network with Zero-MEV guarantee.",
+      "createdAt": "2026-11-14T15:52:42.648Z",
+      "updatedAt": "2026-11-14T15:52:44.130Z",
+      "vaultArmReceipt": {
+        "success": true,
+        "isLiveOnChain": false,
+        "contractId": "zerodrain-relayer-vault.testnet",
+        "orderId": "ord_1794671562648_az1ap",
+        "depositNear": 0.1,
+        "returnWallet": "integration_tester.testnet",
+        "txHash": "arm_mock_1794671562649_c5qhn",
+        "explorerUrl": "https://testnet.nearblocks.io/txns/arm_mock_1794671562649_c5qhn",
+        "timestamp": 1794671562649
+      },
+      "entryTxHash": "tx_1794671564130_3kzdp6a",
+      "explorerUrl": "https://testnet.nearblocks.io/txns/tx_1794671564130_3kzdp6a"
+    },
+    {
+      "orderId": "ord_dbtest_1794671562232",
+      "callerWallet": "suite4_user.testnet",
+      "token": "wrap.testnet",
+      "amount": 2,
+      "sl": -5,
+      "tp": 10,
+      "mode": "TWO_WAY",
+      "status": "IN_POSITION",
+      "entryPrice": 3.32,
+      "intentQuote": null,
+      "webhookUrl": null,
+      "agentReasoning": null,
+      "createdAt": "2026-11-14T15:52:42.234Z",
+      "updatedAt": "2026-11-14T15:52:42.236Z"
+    }
+  ],
   "settlements": [
     {
-      "settlementId": "stl_1794671141981_ay4g",
-      "orderId": "test_ord_1794671141981",
-      "returnWallet": "alice.testnet",
-      "returnedNear": 1.95,
-      "exitReason": "EMERGENCY_SL",
-      "returnTxHash": "hash_test_1",
+      "settlementId": "stl_1794671562344_jdz5",
+      "orderId": "ord_dedup_1794671562344",
+      "returnWallet": "trader.testnet",
+      "returnedNear": 0.98,
+      "exitReason": "STOP_LOSS",
+      "returnTxHash": "tx_hash_primary",
       "pnlPercent": 0,
       "agentReasoning": null,
       "webhookDelivered": false,
-      "settledAt": "2026-11-14T15:45:41.981Z"
+      "settledAt": "2026-11-14T15:52:42.344Z"
     }
   ],
-  "trades": [],
+  "trades": [
+    {
+      "id": "trade_1794671562236",
+      "orderId": "ord_dbtest_1794671562232",
+      "side": "LONG",
+      "token": "wrap.testnet",
+      "entryPrice": 3.32,
+      "exitPrice": 3.65,
+      "pnlPercent": 9.94,
+      "sizeNear": 2,
+      "returnWallet": "suite4_user.testnet",
+      "timestamp": "2026-11-14T15:52:42.236Z"
+    }
+  ],
   "metadata": {
     "version": "1.0.0",
     "created": "2026-11-14T11:15:00.000Z",
-    "lastUpdated": "2026-11-14T15:45:41.981Z"
+    "lastUpdated": "2026-11-14T15:52:44.130Z"
   }
 }
