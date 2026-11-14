@@ -120,6 +120,7 @@ app.post('/api/market/switch-token', async (req, res, next) => {
 app.get('/api/wallet/:accountId', async (req, res, next) => {
   try {
     const { accountId } = req.params;
+    const { network } = req.query;
     if (!isValidNearAccountId(accountId)) {
       throw new ApiGuardError(
         400,
@@ -129,7 +130,7 @@ app.get('/api/wallet/:accountId', async (req, res, next) => {
         'Account IDs must end in .testnet or .near, or be a 64-char hex key.'
       );
     }
-    const details = await nearEngine.getAccountDetails(accountId);
+    const details = await nearEngine.getAccountDetails(accountId, network);
     res.json(details);
   } catch (err) {
     next(err);

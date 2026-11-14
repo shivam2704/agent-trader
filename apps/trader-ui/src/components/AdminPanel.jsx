@@ -4,6 +4,7 @@ import { Bot, Cpu, Play, Square, Copy, Check, Terminal, ShieldCheck, ArrowRightL
 
 export default function AdminPanel({
   config,
+  network = 'testnet',
   marketSymbol,
   agentStatus,
   onDispatchPayload,
@@ -67,6 +68,7 @@ export default function AdminPanel({
     token: token.trim(),
     amount: parseFloat(amount),
     wallet: wallet.trim(),
+    network: network || (wallet.trim().endsWith('.near') ? 'mainnet' : 'testnet'),
     ...(trailingStop ? { trailingStop: true } : {}),
     ...(maxTrades > 1 ? { maxTrades } : {}),
   };
@@ -118,8 +120,8 @@ export default function AdminPanel({
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          originToken: 'wrap.testnet',
-          destinationToken: token.trim() || 'wrap.testnet',
+          originToken: network === 'mainnet' ? 'wrap.near' : 'wrap.testnet',
+          destinationToken: token.trim() || (network === 'mainnet' ? 'wrap.near' : 'wrap.testnet'),
           amount: parseFloat(amount) || 1.0,
           wallet: wallet.trim(),
         }),
@@ -219,12 +221,30 @@ export default function AdminPanel({
             type="text"
             value={wallet}
             onChange={(e) => setWallet(e.target.value)}
-            placeholder="e.g. client_agent_vault.testnet"
+            placeholder={network === 'mainnet' ? 'e.g. client_agent_vault.near' : 'e.g. client_agent_vault.testnet'}
             style={{ width: '100%', background: 'var(--bg-input)', border: '1px solid var(--border-subtle)', borderRadius: '6px', padding: '8px 12px', color: 'var(--text-primary)', fontSize: 'var(--text-base)', outline: 'none' }}
           />
           <span style={{ fontSize: 'var(--text-xs)', color: 'var(--text-muted)', marginTop: '3px', display: 'block', lineHeight: 1.35 }}>
             When position closes or SL triggers, capital + profit will be sent back to this wallet.
           </span>
+          {network === 'mainnet' && (
+            <div style={{
+              padding: '6px 9px',
+              borderRadius: '5px',
+              background: 'rgba(245, 158, 11, 0.08)',
+              border: '1px solid rgba(245, 158, 11, 0.25)',
+              color: '#f59e0b',
+              fontSize: 'var(--text-xs)',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+              marginTop: '6px',
+              lineHeight: 1.3
+            }}>
+              <ShieldCheck size={13} style={{ flexShrink: 0 }} />
+              <span><strong>Non-Custodial Mainnet Mode:</strong> Funds remain 100% under your wallet control. Execution verified via FastNear Mainnet RPC.</span>
+            </div>
+          )}
         </div>
 
         {/* FIELD 2: TARGET TOKEN */}

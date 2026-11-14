@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { Activity, Cpu, Check, Copy, ShieldCheck, ExternalLink, BookOpen, Radio, Sun, Moon } from 'lucide-react';
 
-export default function Navbar({ marketPrice, marketSymbol, agentStatus, targetWallet, feeStats, theme, onToggleTheme }) {
+export default function Navbar({ marketPrice, marketSymbol, agentStatus, targetWallet, feeStats, theme, onToggleTheme, network = 'testnet', onToggleNetwork }) {
   const [copied, setCopied] = useState(false);
 
   const isHalted = agentStatus === 'CIRCUIT_BREAKER_HALTED';
@@ -22,9 +22,10 @@ export default function Navbar({ marketPrice, marketSymbol, agentStatus, targetW
     : 'ENGINE ONLINE';
 
   const copyCurl = () => {
+    const isMainnet = network === 'mainnet';
     const curl = `curl -X POST https://zerodrain-agent-trader.onrender.com/api/agent/trade \\
   -H "Content-Type: application/json" \\
-  -d '{"sl":5.0,"tp":10.0,"token":"wrap.testnet","amount":3.0,"wallet":"client_agent_vault.testnet"}'`;
+  -d '{"sl":5.0,"tp":10.0,"token":"${isMainnet ? 'wrap.near' : 'wrap.testnet'}","amount":${isMainnet ? '1.0' : '3.0'},"wallet":"${isMainnet ? 'client_agent_vault.near' : 'client_agent_vault.testnet'}","network":"${network}"}'`;
     navigator.clipboard.writeText(curl);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
@@ -63,9 +64,28 @@ export default function Navbar({ marketPrice, marketSymbol, agentStatus, targetW
             <span style={{ fontSize: 'var(--text-base)', fontWeight: 700, letterSpacing: '-0.01em', color: 'var(--text-primary)' }}>
               ZeroDrain<span style={{ color: 'var(--accent-blue)' }}>.AI</span>
             </span>
-            <span style={{ fontSize: 'var(--text-xs)', padding: '1px 5px', borderRadius: '3px', background: 'var(--border-subtle)', color: 'var(--text-muted)', fontWeight: 600 }} title="Running on NEAR Testnet RPC">
-              TESTNET
-            </span>
+            <button
+              type="button"
+              onClick={onToggleNetwork}
+              title={network === 'mainnet' ? 'Currently on NEAR Mainnet (Real Money). Click to switch to Testnet.' : 'Currently on NEAR Testnet (Risk-Free Sandbox). Click to switch to Mainnet.'}
+              style={{
+                fontSize: 'var(--text-xs)',
+                padding: '2px 8px',
+                borderRadius: '12px',
+                cursor: 'pointer',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '5px',
+                border: network === 'mainnet' ? '1px solid #f59e0b' : '1px solid var(--border-subtle)',
+                background: network === 'mainnet' ? 'rgba(245, 158, 11, 0.15)' : 'var(--bg-input)',
+                color: network === 'mainnet' ? '#f59e0b' : 'var(--text-muted)',
+                fontWeight: 700,
+                transition: 'all 0.2s ease',
+              }}
+            >
+              <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: network === 'mainnet' ? '#f59e0b' : 'var(--accent-green)' }} />
+              {network === 'mainnet' ? 'MAINNET' : 'TESTNET'}
+            </button>
           </div>
         </div>
 
@@ -121,10 +141,10 @@ export default function Navbar({ marketPrice, marketSymbol, agentStatus, targetW
 
         {/* Smart Contract Vault */}
         <a
-          href="https://testnet.nearblocks.io/address/zerodrain-relayer-vault.testnet"
+          href={network === 'mainnet' ? 'https://nearblocks.io/address/zerodrain-vault.near' : 'https://testnet.nearblocks.io/address/zerodrain-relayer-vault.testnet'}
           target="_blank"
           rel="noopener noreferrer"
-          title="View audited ZeroDrain Vault Smart Contract (zerodrain-relayer-vault.testnet) on NearBlocks Explorer"
+          title={`View audited ZeroDrain Vault Smart Contract on NEAR ${network === 'mainnet' ? 'Mainnet' : 'Testnet'} Explorer`}
           style={{ display: 'flex', alignItems: 'center', gap: '5px', padding: '5px 10px', borderRadius: '6px', border: '1px solid var(--border-subtle)', background: 'transparent', color: 'var(--text-secondary)', fontSize: 'var(--text-sm)', fontWeight: 600, textDecoration: 'none', transition: 'all 0.15s', whiteSpace: 'nowrap' }}
         >
           <ShieldCheck size={13} color="var(--accent-green)" />

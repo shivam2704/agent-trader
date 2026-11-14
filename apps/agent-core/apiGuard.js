@@ -209,6 +209,10 @@ function validateTradePayload(body) {
     }
   }
 
+  const cleanNetwork = (body.network && typeof body.network === 'string' && body.network.toLowerCase() === 'mainnet')
+    ? 'mainnet'
+    : (cleanWallet.endsWith('.near') ? 'mainnet' : 'testnet');
+
   return {
     wallet: cleanWallet,
     token: token.trim(),
@@ -219,6 +223,7 @@ function validateTradePayload(body) {
     webhookUrl: webhookUrl ? webhookUrl.trim() : null,
     trailingStop: Boolean(trailingStop === true || trailingStop === 'true'),
     maxTrades: maxTrades ? parseInt(maxTrades) : 1,
+    network: cleanNetwork,
   };
 }
 

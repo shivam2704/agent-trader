@@ -22,8 +22,24 @@ const CANONICAL_TESTNET_CONTRACTS = {
   AURORA: 'aurora.fakes.testnet',
 };
 
+const CANONICAL_MAINNET_CONTRACTS = {
+  NEAR: 'wrap.near',
+  WNEAR: 'wrap.near',
+  WRAP: 'wrap.near',
+  ETH: 'c02aaa39b223fe8d0a0e5c4f27ead9083c756cc2.factory.bridge.near',
+  WETH: 'c02aaa39b223fe8d0a0e5c4f27ead9083c756cc2.factory.bridge.near',
+  BTC: '2260fac5e5542a773aa44fbcfedf7c193bc2c599.factory.bridge.near',
+  WBTC: '2260fac5e5542a773aa44fbcfedf7c193bc2c599.factory.bridge.near',
+  SOL: '22.contract.portalbridge.near',
+  USDC: '17208628f84f5d6ad33f0da3bbbeb27ffcb398eac501a31bd6ad2011e36133a1',
+  USDT: 'dac17f958d2ee523a2206206994597c13d831ec7.factory.bridge.near',
+  DOGE: 'doge.omft.near',
+  AURORA: 'aurora',
+};
+
 export default function App() {
   const [theme, setTheme] = useState(() => localStorage.getItem('zd_theme') || 'dark');
+  const [network, setNetwork] = useState(() => localStorage.getItem('zd_network') || 'testnet');
   const [isOrderBookCollapsed, setIsOrderBookCollapsed] = useState(false);
 
   useEffect(() => {
@@ -31,8 +47,16 @@ export default function App() {
     localStorage.setItem('zd_theme', theme);
   }, [theme]);
 
+  useEffect(() => {
+    localStorage.setItem('zd_network', network);
+  }, [network]);
+
   const toggleTheme = () => {
     setTheme((prev) => (prev === 'dark' ? 'light' : 'dark'));
+  };
+
+  const toggleNetwork = () => {
+    setNetwork((prev) => (prev === 'testnet' ? 'mainnet' : 'testnet'));
   };
 
   const [state, setState] = useState({
@@ -168,7 +192,8 @@ export default function App() {
     try {
       const sym = typeof tokenObj === 'string' ? tokenObj : tokenObj.symbol;
       const upperSym = (sym || 'NEAR').toUpperCase();
-      const canonicalContract = CANONICAL_TESTNET_CONTRACTS[upperSym] || tokenObj.testnetContract || tokenObj.contractId || sym;
+      const contractMap = network === 'mainnet' ? CANONICAL_MAINNET_CONTRACTS : CANONICAL_TESTNET_CONTRACTS;
+      const canonicalContract = contractMap[upperSym] || tokenObj.mainnetContract || tokenObj.testnetContract || tokenObj.contractId || sym;
       const res = await fetch('/api/market/switch-token', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -204,6 +229,8 @@ export default function App() {
         feeStats={state.feeStats}
         theme={theme}
         onToggleTheme={toggleTheme}
+        network={network}
+        onToggleNetwork={toggleNetwork}
       />
 
       {/* ── Main grid ── */}
@@ -226,6 +253,7 @@ export default function App() {
           <div>
             <AdminPanel
               config={state.config}
+              network={network}
               marketSymbol={state.market?.symbol}
               agentStatus={state.status}
               lastPayload={state.lastPayload}

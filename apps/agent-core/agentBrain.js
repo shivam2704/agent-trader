@@ -213,8 +213,8 @@ class AgentBrain {
   }
 
   // Handle incoming programmatic Agent payload:
-  // { sl, tp, token, amount, wallet, mode, executeImmediately, webhookUrl, trailingStop, maxTrades }
-  async handleAgentPayload({ sl, tp, token, amount, wallet, mode = 'TWO_WAY', executeImmediately = true, webhookUrl, trailingStop = false, maxTrades = 1 }) {
+  // { sl, tp, token, amount, wallet, mode, executeImmediately, webhookUrl, trailingStop, maxTrades, network }
+  async handleAgentPayload({ sl, tp, token, amount, wallet, mode = 'TWO_WAY', executeImmediately = true, webhookUrl, trailingStop = false, maxTrades = 1, network }) {
     // Multi-Position Capacity Guard (Allow up to 15 concurrent positions)
     if (this.positions.size >= 15) {
       throw new Error(`Maximum concurrent active positions (15) reached. Close an active position before submitting a new order.`);
@@ -231,24 +231,35 @@ class AgentBrain {
       throw new Error('Valid positive "amount" is required in payload');
     }
 
+    const cleanWallet = wallet.trim();
+    const isMainnet = network === 'mainnet' || cleanWallet.endsWith('.near');
+    const detectedNetwork = isMainnet ? 'mainnet' : 'testnet';
+
     const cleanSl = -Math.abs(parseFloat(sl !== undefined ? sl : 5.0));
     const cleanTp = Math.abs(parseFloat(tp !== undefined ? tp : 10.0));
     const cleanTrailingStop = Boolean(trailingStop === true || trailingStop === 'true');
     const cleanMaxTrades = Math.max(1, parseInt(maxTrades) || 1);
 
-    // Normalize common token symbols and raw bridge hashes to NEAR testnet NEP-141 contracts
+    // Normalize common token symbols to NEAR contracts (Mainnet vs Testnet)
     let tokenContract = token.trim();
     const tokenUpper = tokenContract.toUpperCase();
-    if (tokenUpper === 'NEAR' || tokenUpper === 'WNEAR' || tokenUpper === 'WRAP') tokenContract = 'wrap.testnet';
-    else if (tokenUpper === 'ETH' || tokenUpper === 'WETH' || tokenUpper.includes('ETH.BRIDGE.NEAR')) tokenContract = 'weth.fakes.testnet';
-    else if (tokenUpper === 'BTC' || tokenUpper === 'WBTC' || tokenUpper.includes('2260FAC5') || tokenUpper.includes('BTC.OMFT.NEAR')) tokenContract = 'wbtc.fakes.testnet';
-    else if (tokenUpper === 'SOL' || tokenUpper.includes('SOL.OMFT.NEAR')) tokenContract = 'sol.fakes.testnet';
-    else if (tokenUpper === 'USDC' || tokenUpper.includes('17208628')) tokenContract = 'usdc.fakes.testnet';
-    else if (tokenUpper === 'USDT' || tokenUpper.includes('USDT.TETHER')) tokenContract = 'usdt.fakes.testnet';
-    else if (tokenUpper === 'AURORA') tokenContract = 'aurora.fakes.testnet';
+    if (isMainnet) {
+      if (tokenUpper === 'NEAR' || tokenUpper === 'WNEAR' || tokenUpper === 'WRAP') tokenContract = 'wrap.near';
+      else if (tokenUpper === 'USDT' || tokenUpper.includes('USDT.TETHER')) tokenContract = 'dac17f958d2ee523a2206206994597c13d831ec7.factory.bridge.near';
+      else if (tokenUpper === 'USDC' || tokenUpper.includes('17208628')) tokenContract = '17208628f84f5d6ad33f0da3bbbeb27ffcb398eac501a31bd6ad2011e36133a1';
+      else if (tokenUpper === 'BTC' || tokenUpper === 'WBTC' || tokenUpper.includes('2260FAC5')) tokenContract = '2260fac5e5542a773aa44fbcfedf7c193bc2c599.factory.bridge.near';
+      else if (tokenUpper === 'ETH' || tokenUpper === 'WETH' || tokenUpper.includes('ETH.BRIDGE.NEAR')) tokenContract = 'c02aaa39b223fe8d0a0e5c4f27ead9083c756cc2.factory.bridge.near';
+    } else {
+      if (tokenUpper === 'NEAR' || tokenUpper === 'WNEAR' || tokenUpper === 'WRAP') tokenContract = 'wrap.testnet';
+      else if (tokenUpper === 'ETH' || tokenUpper === 'WETH' || tokenUpper.includes('ETH.BRIDGE.NEAR')) tokenContract = 'weth.fakes.testnet';
+      else if (tokenUpper === 'BTC' || tokenUpper === 'WBTC' || tokenUpper.includes('2260FAC5') || tokenUpper.includes('BTC.OMFT.NEAR')) tokenContract = 'wbtc.fakes.testnet';
+      else if (tokenUpper === 'SOL' || tokenUpper.includes('SOL.OMFT.NEAR')) tokenContract = 'sol.fakes.testnet';
+      else if (tokenUpper === 'USDC' || tokenUpper.includes('17208628')) tokenContract = 'usdc.fakes.testnet';
+      else if (tokenUpper === 'USDT' || tokenUpper.includes('USDT.TETHER')) tokenContract = 'usdt.fakes.testnet';
+      else if (tokenUpper === 'AURORA') tokenContract = 'aurora.fakes.testnet';
+    }
 
     const orderId = `ord_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
-    const cleanWallet = wallet.trim();
     const tokenSym = tokenUpper.split('.')[0];
 
     // Generate entry reasoning
@@ -261,6 +272,7 @@ class AgentBrain {
       wallet: cleanWallet,
       trailingStop: cleanTrailingStop,
       maxTrades: cleanMaxTrades,
+      network: detectedNetwork,
     });
 
     this.lastPayload = {
@@ -749,6 +761,7 @@ class AgentBrain {
         tokenContract: targetPos.token,
         txReason: reason,
         orderId: targetPos.orderId || orderId,
+        network: targetPos.network || (returnWallet.endsWith('.near') ? 'mainnet' : 'testnet'),
       });
 
       if (returnSettlement && returnSettlement.isLiveOnChain) {
