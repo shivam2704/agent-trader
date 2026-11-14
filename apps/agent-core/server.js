@@ -144,8 +144,8 @@ app.post('/api/intents/quote', async (req, res) => {
   try {
     const { originToken, destinationToken, amount, wallet, slippageToleranceBps } = req.body;
     const quote = await nearIntentsEngine.generateIntentQuote({
-      originToken: originToken || 'wrap.near',
-      destinationToken: destinationToken || '17208628f84f5d6ad33f0da3bbbeb27ffcb398eac501a31bd6ad2011e36133a1',
+      originToken: originToken || 'wrap.testnet',
+      destinationToken: destinationToken || 'USDC',
       amount: amount || 1.0,
       wallet: (wallet || agentBrain.config.wallet || '').trim(),
       slippageToleranceBps: slippageToleranceBps || 50,
