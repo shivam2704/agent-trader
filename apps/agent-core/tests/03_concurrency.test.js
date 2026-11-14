@@ -1,6 +1,7 @@
 // apps/agent-core/tests/03_concurrency.test.js
 // Production-grade Unit Test Suite for Concurrency, Multi-Position Registry, and Anti-Race Locks
 
+process.env.NODE_ENV = 'test';
 const { describe, it } = require('node:test');
 const assert = require('node:assert');
 const dbEngine = require('../dbEngine');

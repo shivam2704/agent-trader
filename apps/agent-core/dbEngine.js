@@ -6,10 +6,12 @@ const fs = require('fs');
 const path = require('path');
 
 class DBEngine {
-  constructor() {
+  constructor(customFileName) {
     this.dataDir = path.join(__dirname, 'data');
-    this.dbFile = path.join(this.dataDir, 'agent_ledger.json');
-    this.tmpFile = path.join(this.dataDir, 'agent_ledger.json.tmp');
+    const isTest = process.env.NODE_ENV === 'test';
+    const fileName = customFileName || process.env.LEDGER_DB_FILE || (isTest ? 'agent_ledger.test.json' : 'agent_ledger.json');
+    this.dbFile = path.join(this.dataDir, fileName);
+    this.tmpFile = path.join(this.dataDir, `${fileName}.tmp`);
 
     // In-memory data store
     this.state = {
@@ -275,3 +277,4 @@ class DBEngine {
 
 const dbEngine = new DBEngine();
 module.exports = dbEngine;
+module.exports.DBEngine = DBEngine;

@@ -1,6 +1,7 @@
 // apps/agent-core/tests/04_dbEngine.test.js
 // Production-grade Unit Test Suite for Persistent Database Engine & Query Indexing
 
+process.env.NODE_ENV = 'test';
 const { describe, it } = require('node:test');
 const assert = require('node:assert');
 const dbEngine = require('../dbEngine');

@@ -55,7 +55,7 @@ describe('Suite 2: Machine-Readable Agent Trade Gateway Endpoints', () => {
   let createdOrderId = null;
 
   after(async () => {
-    // Clean up only the specific integration test order, preserving user DB data
+    // Clean up test order and purge test records so production ledger remains 100% pristine
     if (createdOrderId) {
       try {
         await fetch(`${baseUrl}/api/agent/exit`, {
@@ -63,6 +63,12 @@ describe('Suite 2: Machine-Readable Agent Trade Gateway Endpoints', () => {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ orderId: createdOrderId }),
         });
+        const dbEngine = require('../dbEngine');
+        dbEngine.state.orders = dbEngine.state.orders.filter((o) => o.callerWallet !== 'integration_tester.testnet');
+        dbEngine.state.settlements = dbEngine.state.settlements.filter((s) => s.returnWallet !== 'integration_tester.testnet');
+        dbEngine.state.trades = dbEngine.state.trades.filter((t) => t.returnWallet !== 'integration_tester.testnet');
+        dbEngine.rebuildIndexes();
+        dbEngine.flush();
       } catch (e) {
         // ignore
       }
