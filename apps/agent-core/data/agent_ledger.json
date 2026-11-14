@@ -1,10 +1,23 @@
 {
   "orders": [],
-  "settlements": [],
+  "settlements": [
+    {
+      "settlementId": "stl_1794671141981_ay4g",
+      "orderId": "test_ord_1794671141981",
+      "returnWallet": "alice.testnet",
+      "returnedNear": 1.95,
+      "exitReason": "EMERGENCY_SL",
+      "returnTxHash": "hash_test_1",
+      "pnlPercent": 0,
+      "agentReasoning": null,
+      "webhookDelivered": false,
+      "settledAt": "2026-11-14T15:45:41.981Z"
+    }
+  ],
   "trades": [],
   "metadata": {
     "version": "1.0.0",
     "created": "2026-11-14T11:15:00.000Z",
-    "lastUpdated": "2026-11-14T11:15:00.000Z"
+    "lastUpdated": "2026-11-14T15:45:41.981Z"
   }
 }
