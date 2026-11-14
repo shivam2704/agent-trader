@@ -3,14 +3,23 @@
 > **"Payload In ➔ Trade & Manage ➔ Return Capital to Same Wallet — With Mathematical Risk Protection."**  
 > An autonomous, non-custodial trading execution node built for AI agents and automated callers on **NEAR Protocol**, powered by **NEAR Intents & the Defuse 1-Click Swap Protocol (`1click.chaindefuser.com`)**.
 
+- **🏆 Hackathon Tracks:** `Agent Economy` • `Unstoppable DeFi` • `AI Security & Defense`
+- **🌐 Network:** NEAR Testnet (Live Verified On-Chain) + FastNear Mainnet Switcher
+- **⚡ Live Terminal & Node:** [https://zerodrain-agent-trader.onrender.com/](https://zerodrain-agent-trader.onrender.com/)
+- **📚 Interactive Swagger / OpenAPI 3.0:** [https://zerodrain-agent-trader.onrender.com/docs](https://zerodrain-agent-trader.onrender.com/docs)
+- **⛓️ Smart Contract Vault:** [`zerodrain-relayer-vault.testnet`](https://testnet.nearblocks.io/address/zerodrain-relayer-vault.testnet)
+- **🎬 Demo Video:** `ZeroDrain_Hackathon_Demo_Studio.mp4` *(2m 15s HD with Neural Voiceover)*
+- **🧪 Automated Verification Suite:** `npm test` *(51/51 assertions passing across 15 suites)*
+
 ---
 
-### 🌐 Live Production Links (Instant Verification)
-- **Live Trading Terminal & Node:** [https://zerodrain-agent-trader.onrender.com/](https://zerodrain-agent-trader.onrender.com/)
-- **Interactive Swagger / OpenAPI Docs:** [https://zerodrain-agent-trader.onrender.com/docs](https://zerodrain-agent-trader.onrender.com/docs)
-- **NEAR Testnet Smart Contract Vault:** [`zerodrain-relayer-vault.testnet`](https://testnet.nearblocks.io/address/zerodrain-relayer-vault.testnet)
-- **Defuse Omnichain Solver Bus:** `https://1click.chaindefuser.com`
-- **Automated Claude Code & Codex Test:** `npm test` *(51/51 verified assertions across 15 suites passing)*
+## 🎯 Hackathon Tracks Alignment
+
+| Track | The Core Problem | How ZeroDrain AI Solves It |
+| :--- | :--- | :--- |
+| **🤖 Agent Economy** | AI agents (ElizaOS, AutoGPT, LangChain) have treasuries but lack headless execution infrastructure with programmatic risk guardrails. | Provides a 100% headless Intent Gateway (`POST /api/agent/trade`) with machine-readable JSON error contracts, async polling, and webhook delivery. Agents trade without browser popups or human intervention. |
+| **⚡ Unstoppable DeFi** | Trading bots suffer predatory MEV, frontrunning, and custodial vulnerabilities when trading on traditional AMMs. | Integrates with **NEAR Intents & Defuse 1-Click Solver Bus** (`1click.chaindefuser.com`) for atomic Zero-MEV solver execution and cross-chain liquidity across Bitcoin, Solana, and Ethereum. |
+| **🛡️ AI Security & Defense** | Runaway agent execution loops, hallucinated bad orders, or market flash crashes can drain an agent's entire wallet in seconds. | Acts as an on-chain **Post-Trade Risk Sentinel**: 3-second continuous mark-to-market monitoring, dynamic trailing stop-loss profit locks, and cryptographic same-wallet return guarantees enforced by smart contract. |
 
 ---
 
@@ -148,6 +157,15 @@ console.log("Order ID:", data.orderId);
 - **Zero Private Key Sharing:** Caller AI agents **never** expose or share private keys.
 - **No Fund Diversion Guarantee:** The relayer can only invoke `settle_circuit_breaker`, which executes `Promise::new(order.return_wallet).transfer(...)`.
 - **Emergency Sovereign Exit:** In the event of a catastrophic server outage, the caller can execute `emergency_cancel(order_id)` on-chain directly to withdraw 100% of deposited capital back to their wallet.
+
+#### Smart Contract Method Interface (`contracts/zero_drain_vault` / Rust `near-sdk`):
+| Method | Caller Permission | Action & Description | Cryptographic Invariant |
+| :--- | :--- | :--- | :--- |
+| `delegate_agent(agent, cap)` | Vault Owner | Delegates scoped execution authority to an AI agent key. | Agent key is restricted to trade execution only. |
+| `execute_trade(order_id, token, amount, sl, tp)` | Delegated Agent | Arms position in vault with strict drawdown threshold. | `return_wallet` is immutably bound to depositor. |
+| `trigger_circuit_breaker(order_id)` | Sentinel / Relayer | Liquidates position upon Stop-Loss breach. | Enforces `Promise::transfer` strictly to `order.return_wallet`. |
+| `revoke_agent()` | Vault Owner | Instant sovereign kill switch. | Immediately unbinds agent trading permissions. |
+| `get_vault_state()` | Public View | Inspects real-time vault balances and active orders. | Zero-gas read-only query. |
 
 ### 3. 🎯 NEAR Intents & 1-Click Swap Protocol (Defuse Engine)
 - Direct integration with **NEAR Intents / Defuse Protocol solver bus (`https://1click.chaindefuser.com`)**.
