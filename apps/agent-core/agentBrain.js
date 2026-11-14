@@ -564,8 +564,6 @@ class AgentBrain {
 
         // 1. HARD CIRCUIT BREAKER CHECK (Per-Position SL / Trailing SL)
         if (pos.pnlPercent <= pos.sl) {
-          pos.isExiting = true;
-          this.exitingOrders.add(pos.orderId);
           const isTrailingFloor = pos.trailingStop && pos.sl > pos.initialSl;
           const exitReason = isTrailingFloor ? 'TRAILING_SL' : 'EMERGENCY_SL';
           this.addLog(
@@ -578,8 +576,6 @@ class AgentBrain {
 
         // 2. TAKE PROFIT CHECK (Per-Position TP)
         if (pos.pnlPercent >= pos.tp) {
-          pos.isExiting = true;
-          this.exitingOrders.add(pos.orderId);
           this.addLog(
             'TRADE',
             `🎯 TAKE PROFIT TARGET HIT for Order ${pos.orderId}! Gain is +${pos.pnlPercent}% (Target: +${pos.tp}%). Realizing profit...`
