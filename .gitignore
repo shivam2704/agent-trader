@@ -35,3 +35,9 @@ apps/agent-core/data/*.tmp
 Thumbs.db
 .idea/
 .vscode/
+
+# Local demo video generator scripts
+generate_*.js
+record_*.js
+temp_*
+slides/
