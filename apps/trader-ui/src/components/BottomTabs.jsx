@@ -18,19 +18,21 @@ export default function BottomTabs({ positions, currentPrice, trades, logs, onCl
     {
       icon: <BarChart2 size={13} />,
       label: 'Settled History',
+      badge: trades?.length || 0,
       tooltip: 'Audited ledger of settled trades with on-chain NEAR receipt proofs',
     },
     {
       icon: <Terminal size={13} />,
       label: 'Node Logs',
+      badge: logs?.length || 0,
       tooltip: 'Real-time execution & solver audit trail streaming from the backend trading node',
     },
   ];
 
   return (
-    <div className="glass-panel" style={{ overflow: 'hidden' }}>
+    <div className="glass-panel" style={{ overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
       {/* Tab bar */}
-      <div style={{ display: 'flex', borderBottom: '1px solid var(--border-subtle)', background: 'var(--bg-input)' }}>
+      <div style={{ display: 'flex', borderBottom: '1px solid var(--border-subtle)', background: 'var(--bg-input)', flexShrink: 0 }}>
         {tabs.map((tab, i) => {
           const isActive = active === i;
           return (
@@ -63,8 +65,9 @@ export default function BottomTabs({ positions, currentPrice, trades, logs, onCl
                   fontWeight: 700,
                   padding: '1px 6px',
                   borderRadius: '10px',
-                  background: 'var(--accent-blue)',
-                  color: '#fff',
+                  background: isActive ? 'var(--accent-blue)' : 'var(--bg-input)',
+                  border: isActive ? 'none' : '1px solid var(--border-subtle)',
+                  color: isActive ? '#fff' : 'var(--text-muted)',
                   minWidth: '18px',
                   textAlign: 'center',
                 }}>
@@ -76,22 +79,32 @@ export default function BottomTabs({ positions, currentPrice, trades, logs, onCl
         })}
       </div>
 
-      {/* Tab content */}
-      <div style={{ minHeight: '240px' }}>
+      {/* Fixed-Height Viewport (Rock-solid 270px container with internal scrolling) */}
+      <div style={{
+        height: '270px',
+        maxHeight: '270px',
+        overflowY: 'auto',
+        overflowX: 'hidden',
+        display: 'flex',
+        flexDirection: 'column',
+        position: 'relative',
+      }}>
         {active === 0 && (
-          <ActiveOrdersTable
-            positions={positions}
-            currentPrice={currentPrice}
-            onClosePosition={onClosePosition}
-          />
+          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0 }}>
+            <ActiveOrdersTable
+              positions={positions}
+              currentPrice={currentPrice}
+              onClosePosition={onClosePosition}
+            />
+          </div>
         )}
         {active === 1 && (
-          <div style={{ padding: '12px' }}>
+          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0, padding: '10px 12px' }}>
             <TradeHistory trades={trades} />
           </div>
         )}
         {active === 2 && (
-          <div style={{ padding: '12px' }}>
+          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0, padding: '10px 14px' }}>
             <AgentTerminal logs={logs} />
           </div>
         )}
@@ -99,4 +112,3 @@ export default function BottomTabs({ positions, currentPrice, trades, logs, onCl
     </div>
   );
 }
-

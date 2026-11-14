@@ -205,6 +205,10 @@ input[type=number] { -moz-appearance: textfield; appearance: textfield; }
   border-bottom: 1px solid var(--border-subtle);
   white-space: nowrap;
   user-select: none;
+  position: sticky;
+  top: 0;
+  background: var(--bg-card);
+  z-index: 2;
 }
 .data-table td {
   padding: 8px 12px;

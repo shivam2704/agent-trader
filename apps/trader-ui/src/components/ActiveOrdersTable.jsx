@@ -37,13 +37,13 @@ export default function ActiveOrdersTable({ positions = [], currentPrice, onClos
 
   if (!positions || positions.length === 0) {
     return (
-      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '48px 24px', gap: '10px' }}>
-        <Layers size={28} color="var(--text-muted)" strokeWidth={1.2} />
-        <p style={{ fontSize: '0.83rem', color: 'var(--text-muted)', textAlign: 'center' }}>
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '40px 20px', gap: '8px' }}>
+        <Layers size={28} color="var(--text-muted)" strokeWidth={1.2} style={{ opacity: 0.7 }} />
+        <p style={{ fontSize: '0.83rem', color: 'var(--text-muted)', textAlign: 'center', margin: 0 }}>
           No active positions.
         </p>
-        <p style={{ fontSize: '0.72rem', color: 'var(--text-muted)', opacity: 0.6 }}>
-          Send an agent payload via API to open a trade.
+        <p style={{ fontSize: '0.72rem', color: 'var(--text-muted)', opacity: 0.6, margin: 0 }}>
+          Send an agent payload via API or Execute Trade above to open a position.
         </p>
       </div>
     );

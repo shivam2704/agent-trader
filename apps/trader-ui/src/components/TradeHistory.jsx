@@ -14,8 +14,12 @@ export default function TradeHistory({ trades = [] }) {
 
   if (uniqueTrades.length === 0) {
     return (
-      <div style={{ padding: '32px', textAlign: 'center', color: 'var(--text-muted)', fontSize: '0.8rem' }}>
-        No settled positions. Closed trades with on-chain receipts appear here.
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '40px 20px', textAlign: 'center', color: 'var(--text-muted)', fontSize: '0.8rem' }}>
+        <History size={26} color="var(--text-muted)" strokeWidth={1.3} style={{ marginBottom: '8px', opacity: 0.7 }} />
+        <span>No settled positions yet.</span>
+        <span style={{ fontSize: '0.72rem', opacity: 0.6, marginTop: '3px' }}>
+          Closed trades with cryptographic on-chain receipts appear here.
+        </span>
       </div>
     );
   }
