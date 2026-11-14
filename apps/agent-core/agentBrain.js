@@ -61,6 +61,10 @@ class AgentBrain {
     this.logs = [];
     this.listeners = []; // WS callback listeners
 
+    // Concurrency guards to prevent duplicate execution & race conditions
+    this.isHeartbeating = false;
+    this.exitingOrders = new Set();
+
     // Rehydrate active in-position orders from persistent DB on startup
     this.rehydrateActivePositions();
   }
@@ -507,12 +511,18 @@ class AgentBrain {
 
   // Autonomous Monitoring Heartbeat across ALL Concurrent Positions
   async heartbeat() {
+    if (this.isHeartbeating) return;
+    this.isHeartbeating = true;
     try {
       const market = await marketEngine.updateMarketPrice();
       if (!market || !market.price) return;
 
       // Iterate through all active concurrent positions
       for (const pos of Array.from(this.positions.values())) {
+        if (!pos.inPosition || pos.isExiting || pos.exitInProgress || this.exitingOrders.has(pos.orderId)) {
+          continue;
+        }
+
         const currentPrice = this.getTokenCurrentPrice(pos.token, pos.tokenSymbol);
         pos.currentPrice = currentPrice;
 
@@ -549,6 +559,8 @@ class AgentBrain {
 
         // 1. HARD CIRCUIT BREAKER CHECK (Per-Position SL / Trailing SL)
         if (pos.pnlPercent <= pos.sl) {
+          pos.isExiting = true;
+          this.exitingOrders.add(pos.orderId);
           const isTrailingFloor = pos.trailingStop && pos.sl > pos.initialSl;
           const exitReason = isTrailingFloor ? 'TRAILING_SL' : 'EMERGENCY_SL';
           this.addLog(
@@ -561,6 +573,8 @@ class AgentBrain {
 
         // 2. TAKE PROFIT CHECK (Per-Position TP)
         if (pos.pnlPercent >= pos.tp) {
+          pos.isExiting = true;
+          this.exitingOrders.add(pos.orderId);
           this.addLog(
             'TRADE',
             `🎯 TAKE PROFIT TARGET HIT for Order ${pos.orderId}! Gain is +${pos.pnlPercent}% (Target: +${pos.tp}%). Realizing profit...`
@@ -581,6 +595,8 @@ class AgentBrain {
       this.broadcast();
     } catch (err) {
       console.error('Error in agent heartbeat:', err);
+    } finally {
+      this.isHeartbeating = false;
     }
   }
 
@@ -691,7 +707,17 @@ class AgentBrain {
 
     if (!targetPos) return null;
 
-    const exitFeeNear = 0.0018 + (targetPos.sizeNear * 0.0015);
+    // Concurrency lock: prevent duplicate execution for the same order
+    if (targetPos.exitInProgress || (orderId && this.exitingOrders.has(orderId))) {
+      console.warn(`[AgentBrain] Exit already in progress for order ${orderId}. Skipping duplicate.`);
+      return null;
+    }
+    targetPos.isExiting = true;
+    targetPos.exitInProgress = true;
+    if (orderId) this.exitingOrders.add(orderId);
+
+    try {
+      const exitFeeNear = 0.0018 + (targetPos.sizeNear * 0.0015);
     const tokenLivePrice = targetPos.currentPrice || this.getTokenCurrentPrice(targetPos.token) || marketEngine.currentPrice || 1.0;
     this.feeStats.totalFeesPaidNear = parseFloat((this.feeStats.totalFeesPaidNear + exitFeeNear).toFixed(4));
     this.feeStats.totalFeesPaidUsd = parseFloat((this.feeStats.totalFeesPaidNear * tokenLivePrice).toFixed(4));
@@ -865,64 +891,71 @@ class AgentBrain {
       return closedTrade;
     }
 
-    this.tradeHistory.unshift(closedTrade);
-    if (this.tradeHistory.length > 50) this.tradeHistory.pop();
+      if (!this.tradeHistory.some((t) => t.orderId === orderId)) {
+        this.tradeHistory.unshift(closedTrade);
+        if (this.tradeHistory.length > 50) this.tradeHistory.pop();
+      }
 
-    if (this.activeOrder && this.activeOrder.orderId === orderId) {
-      this.activeOrder.status = reason === 'EMERGENCY_SL' ? 'LIQUIDATED_SL' : 'SETTLED_RETURNED';
-      this.activeOrder.returnSettlement = closedTrade;
+      if (this.activeOrder && this.activeOrder.orderId === orderId) {
+        this.activeOrder.status = reason === 'EMERGENCY_SL' ? 'LIQUIDATED_SL' : 'SETTLED_RETURNED';
+        this.activeOrder.returnSettlement = closedTrade;
+      }
+
+      // Trigger Webhook Notification to Caller AI Agent
+      if (targetPos.webhookUrl) {
+        const webhookPayload = {
+          event: reason === 'EMERGENCY_SL' ? 'CIRCUIT_BREAKER_TRIGGERED' : 'TRADE_SETTLED',
+          orderId,
+          callerWallet: returnWallet,
+          exitReason: reason,
+          token: targetPos.token,
+          pnlPercent: targetPos.pnlPercent,
+          pnlUsd: targetPos.pnlUsd,
+          returnedNear: finalSettledNear,
+          returnTxHash: returnSettlement.txHash,
+          returnExplorerUrl: returnSettlement.explorerUrl,
+          agentReasoning: exitReasoning,
+          timestamp: new Date().toISOString(),
+        };
+        this.dispatchWebhook(targetPos.webhookUrl, webhookPayload);
+      }
+
+      // Remove from concurrent positions map
+      this.positions.delete(orderId);
+
+      // Update primary position pointer
+      if (this.positions.size > 0) {
+        this.position = Array.from(this.positions.values())[0];
+        this.status = 'IN_POSITION';
+      } else {
+        this.position = {
+          inPosition: false,
+          orderId: null,
+          returnWallet: null,
+          side: null,
+          entryPrice: 0,
+          currentPrice: 0,
+          sizeNear: 0,
+          pnlUsd: 0,
+          pnlPercent: 0,
+          entryTime: null,
+          entryTxHash: null,
+        };
+        this.status = 'SCANNING';
+      }
+
+      this.addLog(
+        reason === 'EMERGENCY_SL' ? 'EMERGENCY' : 'TRADE',
+        `💸 CLOSED & RETURNED [${orderId}]: PnL: ${closedTrade.pnlPercent}%. Returned ${finalSettledNear} NEAR to ${returnWallet}. Return Tx: ${returnSettlement.txHash}`,
+        { txHash: tx.txHash, returnTxHash: returnSettlement.txHash, returnWallet }
+      );
+      this.broadcast();
+      return closedTrade;
+    } finally {
+      if (orderId) {
+        this.exitingOrders.delete(orderId);
+      }
     }
-
-    // Trigger Webhook Notification to Caller AI Agent
-    if (targetPos.webhookUrl) {
-      const webhookPayload = {
-        event: reason === 'EMERGENCY_SL' ? 'CIRCUIT_BREAKER_TRIGGERED' : 'TRADE_SETTLED',
-        orderId,
-        callerWallet: returnWallet,
-        exitReason: reason,
-        token: targetPos.token,
-        pnlPercent: targetPos.pnlPercent,
-        pnlUsd: targetPos.pnlUsd,
-        returnedNear: finalSettledNear,
-        returnTxHash: returnSettlement.txHash,
-        returnExplorerUrl: returnSettlement.explorerUrl,
-        agentReasoning: exitReasoning,
-        timestamp: new Date().toISOString(),
-      };
-      this.dispatchWebhook(targetPos.webhookUrl, webhookPayload);
-    }
-
-    // Remove from concurrent positions map
-    this.positions.delete(orderId);
-
-    // Update primary position pointer
-    if (this.positions.size > 0) {
-      this.position = Array.from(this.positions.values())[0];
-      this.status = 'IN_POSITION';
-    } else {
-      this.position = {
-        inPosition: false,
-        orderId: null,
-        returnWallet: null,
-        side: null,
-        entryPrice: 0,
-        currentPrice: 0,
-        sizeNear: 0,
-        pnlUsd: 0,
-        pnlPercent: 0,
-        entryTime: null,
-        entryTxHash: null,
-      };
-      this.status = 'SCANNING';
-    }
-
-    this.addLog(
-      reason === 'EMERGENCY_SL' ? 'EMERGENCY' : 'TRADE',
-      `💸 CLOSED & RETURNED [${orderId}]: PnL: ${closedTrade.pnlPercent}%. Returned ${finalSettledNear} NEAR to ${returnWallet}. Return Tx: ${returnSettlement.txHash}`,
-      { txHash: tx.txHash, returnTxHash: returnSettlement.txHash, returnWallet }
-    );
-    this.broadcast();
-    return closedTrade;
   }
 
   getFullState() {

@@ -309,6 +309,16 @@ app.get('/api/agent/settlements', (req, res) => {
   });
 });
 
+// 4.5 Reset / Clear Historical Ledger (Clean slate)
+app.post('/api/agent/reset-ledger', (req, res) => {
+  dbEngine.clear();
+  agentBrain.tradeHistory = [];
+  agentBrain.feeStats.totalFeesPaidNear = 0;
+  agentBrain.feeStats.totalFeesPaidUsd = 0;
+  agentBrain.broadcast();
+  res.json({ success: true, message: 'Ledger cleared successfully.' });
+});
+
 // 4.3 Schema documentation for external AI agents
 app.get('/api/agent/schema', (req, res) => {
   res.json({

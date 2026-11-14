@@ -3,7 +3,16 @@ import React from 'react';
 import { History, ExternalLink } from 'lucide-react';
 
 export default function TradeHistory({ trades = [] }) {
-  if (trades.length === 0) {
+  // Deduplicate by orderId to guarantee exactly 1 row per order
+  const seenOrderIds = new Set();
+  const uniqueTrades = trades.filter((t) => {
+    if (!t.orderId) return true;
+    if (seenOrderIds.has(t.orderId)) return false;
+    seenOrderIds.add(t.orderId);
+    return true;
+  });
+
+  if (uniqueTrades.length === 0) {
     return (
       <div style={{ padding: '32px', textAlign: 'center', color: 'var(--text-muted)', fontSize: '0.8rem' }}>
         No settled positions. Closed trades with on-chain receipts appear here.
@@ -18,7 +27,7 @@ export default function TradeHistory({ trades = [] }) {
           <History size={14} color="var(--text-muted)" />
           <span style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-secondary)', letterSpacing: '0.03em' }}>SETTLED POSITION LEDGER</span>
         </div>
-        <span style={{ fontSize: '0.65rem', color: 'var(--text-muted)' }}>{trades.length} records</span>
+        <span style={{ fontSize: '0.65rem', color: 'var(--text-muted)' }}>{uniqueTrades.length} records</span>
       </div>
 
       <table className="data-table">
@@ -36,7 +45,7 @@ export default function TradeHistory({ trades = [] }) {
           </tr>
         </thead>
         <tbody>
-          {trades.map((t) => {
+          {uniqueTrades.map((t) => {
             const isProfit = t.pnlPercent >= 0;
             const triggerLabel = t.reason === 'EMERGENCY_SL'
               ? 'Stop-Loss'

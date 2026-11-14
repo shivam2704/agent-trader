@@ -180,6 +180,14 @@ class DBEngine {
 
   saveSettlement(settlement) {
     if (!settlement) return null;
+    const orderId = settlement.orderId;
+
+    // Deduplication check: prevent multiple settlements for the same order
+    if (orderId && this.settlementsByOrder.has(orderId)) {
+      console.warn(`[dbEngine] Settlement for order ${orderId} already recorded. Returning existing record.`);
+      return this.settlementsByOrder.get(orderId);
+    }
+
     const now = new Date().toISOString();
 
     const record = {
@@ -225,12 +233,35 @@ class DBEngine {
 
   saveTrade(trade) {
     if (!trade) return null;
+
+    // Deduplication check: prevent multiple trade history entries for the same order
+    if (trade.orderId && (this.state.trades || []).some((t) => t.orderId === trade.orderId)) {
+      console.warn(`[dbEngine] Trade for order ${trade.orderId} already recorded. Skipping duplicate.`);
+      return trade;
+    }
+
     this.state.trades.unshift(trade);
     if (this.state.trades.length > 500) {
       this.state.trades.pop();
     }
     this.flush();
     return trade;
+  }
+
+  clear() {
+    this.state = {
+      orders: [],
+      settlements: [],
+      trades: [],
+      metadata: {
+        version: '1.0.0',
+        created: new Date().toISOString(),
+        lastUpdated: new Date().toISOString(),
+      },
+    };
+    this.rebuildIndexes();
+    this.flush();
+    return true;
   }
 
   getAllTrades(limit = 50) {
