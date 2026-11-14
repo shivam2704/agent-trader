@@ -8,7 +8,6 @@
 - **⚡ Live Terminal & Node:** [https://zerodrain-agent-trader.onrender.com/](https://zerodrain-agent-trader.onrender.com/)
 - **📚 Interactive Swagger / OpenAPI 3.0:** [https://zerodrain-agent-trader.onrender.com/docs](https://zerodrain-agent-trader.onrender.com/docs)
 - **⛓️ Smart Contract Vault:** [`zerodrain-relayer-vault.testnet`](https://testnet.nearblocks.io/address/zerodrain-relayer-vault.testnet)
-- **🎬 Demo Video:** `ZeroDrain_Hackathon_Demo_Studio.mp4` *(2m 15s HD with Neural Voiceover)*
 - **🧪 Automated Verification Suite:** `npm test` *(51/51 assertions passing across 15 suites)*
 
 ---
