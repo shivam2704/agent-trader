@@ -14,6 +14,56 @@
 
 ---
 
+## 🚀 How to Leverage ZeroDrain (For AI Agents, Traders & Judges)
+
+You can leverage ZeroDrain in **three distinct ways** depending on your workflow:
+
+### Mode 1: Interactive Cyber-Terminal (Zero-Code Visual Dashboard)
+1. Open the live terminal: **[https://zerodrain-agent-trader.onrender.com/](https://zerodrain-agent-trader.onrender.com/)**
+2. In the **Intent Gateway** panel on the left:
+   - Enter your NEAR account (e.g. `yourname.testnet`).
+   - Set **Allocation** (e.g. `0.5 NEAR`), **Stop-Loss** (e.g. `5%`), and **Take-Profit** (e.g. `10%`).
+   - Toggle **Trailing Stop** to lock in peak gains dynamically.
+   - Click **"Arm ZeroDrain Agent"**.
+3. **Inspect Real-Time Execution:**
+   - **Active Orders Tab**: Tracks live spot oracle prices, mark-to-market PnL (`+0.17%`), and provides an instant `[✕ Close]` button.
+   - **Settled History Tab**: Immutable ledger of closed positions with direct clickable **On-Chain Proofs on NearBlocks**.
+   - **Node Logs Tab**: High-speed real-time execution & Defuse solver audit trail with Newest-on-Top streaming and zero scroll-jumping.
+
+---
+
+### Mode 2: Headless API for Autonomous AI Agents (cURL / Python / ElizaOS / LangChain)
+AI agents do not have human hands or browser extensions. They connect directly via HTTP/WebSocket:
+
+```bash
+# 1. Open a protected position from any agent
+curl -X POST https://zerodrain-agent-trader.onrender.com/api/agent/trade \
+  -H "Content-Type: application/json" \
+  -d '{
+    "wallet": "your_agent_wallet.testnet",
+    "token": "wrap.testnet",
+    "amount": 1.0,
+    "sl": 5.0,
+    "tp": 10.0,
+    "trailingStop": true,
+    "webhookUrl": "https://your-agent.com/webhook"
+  }'
+
+# 2. Query your live open positions
+curl "https://zerodrain-agent-trader.onrender.com/api/agent/orders?wallet=your_agent_wallet.testnet"
+
+# 3. Query audited settlement receipts & on-chain tx hashes
+curl "https://zerodrain-agent-trader.onrender.com/api/agent/settlements?wallet=your_agent_wallet.testnet"
+```
+
+---
+
+### Mode 3: Interactive Swagger API Playground
+- Open **[https://zerodrain-agent-trader.onrender.com/docs](https://zerodrain-agent-trader.onrender.com/docs)**
+- Inspect complete OpenAPI 3.0 schemas, test trade entries, exit positions, and switch active tracking tokens with 1-click **"Try it out"**.
+
+---
+
 ## 🏆 Hackathon Evaluation Matrix (Judges & Automated Screeners Guide)
 
 Claude Code & Codex screen projects to ensure they build, run, and fulfill their README specification. Below is our self-verifying judging compliance matrix:
