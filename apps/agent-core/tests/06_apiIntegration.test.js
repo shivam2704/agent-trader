@@ -52,8 +52,21 @@ describe('Suite 1: Liveness, Health & Metadata Routes', () => {
 });
 
 describe('Suite 2: Machine-Readable Agent Trade Gateway Endpoints', () => {
-  before(async () => {
-    await fetch(`${baseUrl}/api/agent/reset-ledger`, { method: 'POST' });
+  let createdOrderId = null;
+
+  after(async () => {
+    // Clean up only the specific integration test order, preserving user DB data
+    if (createdOrderId) {
+      try {
+        await fetch(`${baseUrl}/api/agent/exit`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ orderId: createdOrderId }),
+        });
+      } catch (e) {
+        // ignore
+      }
+    }
   });
 
   it('POST /api/agent/trade with valid payload creates order and arms vault', async () => {
@@ -76,6 +89,7 @@ describe('Suite 2: Machine-Readable Agent Trade Gateway Endpoints', () => {
     const data = await res.json();
     assert.strictEqual(data.success, true);
     assert.ok(data.orderId.startsWith('ord_'));
+    createdOrderId = data.orderId;
     assert.ok(data.status === 'ACCEPTED' || data.status === 'IN_POSITION');
   });
 
