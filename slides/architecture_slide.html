@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      width: 1440px;
+      height: 900px;
+      background: radial-gradient(circle at 50% 30%, #0d1b2a 0%, #050811 100%);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      color: #ffffff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      position: relative;
+    }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 16px;
+      background: rgba(0, 210, 255, 0.1);
+      border: 1px solid rgba(0, 210, 255, 0.3);
+      border-radius: 20px;
+      color: #00d2ff;
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      margin-bottom: 24px;
+    }
+    .badge-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #00d2ff;
+      box-shadow: 0 0 10px #00d2ff;
+    }
+    h1 {
+      font-size: 52px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      margin-bottom: 12px;
+      background: linear-gradient(135deg, #ffffff 40%, #00ec97 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-align: center;
+    }
+    .subtitle {
+      font-size: 22px;
+      color: #94a3b8;
+      margin-bottom: 40px;
+      font-weight: 500;
+    }
+    .flow {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 20px;
+      width: 1100px;
+      margin-bottom: 40px;
+    }
+    .flow-step {
+      background: rgba(15, 23, 42, 0.8);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 12px;
+      padding: 24px 20px;
+      flex: 1;
+      text-align: center;
+      box-shadow: 0 15px 30px rgba(0,0,0,0.3);
+    }
+    .flow-icon {
+      font-size: 28px;
+      margin-bottom: 8px;
+    }
+    .flow-title {
+      font-size: 17px;
+      font-weight: 700;
+      color: #f8fafc;
+      margin-bottom: 6px;
+    }
+    .flow-desc {
+      font-size: 13px;
+      color: #94a3b8;
+      line-height: 1.4;
+    }
+    .arrow {
+      font-size: 24px;
+      color: #00ec97;
+    }
+    .invariants {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+      width: 1100px;
+    }
+    .inv-card {
+      background: rgba(30, 41, 59, 0.4);
+      border: 1px solid rgba(0, 236, 151, 0.2);
+      border-radius: 10px;
+      padding: 16px 20px;
+    }
+    .inv-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: #00ec97;
+      margin-bottom: 4px;
+    }
+    .inv-desc {
+      font-size: 13px;
+      color: #cbd5e1;
+      line-height: 1.4;
+    }
+    .footer {
+      position: absolute;
+      bottom: 30px;
+      font-size: 14px;
+      color: #64748b;
+    }
+  </style>
+</head>
+<body>
+  <div class="badge">
+    <div class="badge-dot"></div>
+    System Architecture
+  </div>
+  <h1>How ZeroDrain Works</h1>
+  <div class="subtitle">End-to-End Non-Custodial Intent Execution Pipeline</div>
+
+  <div class="flow">
+    <div class="flow-step">
+      <div class="flow-icon">🤖</div>
+      <div class="flow-title">1. Autonomous AI Agent</div>
+      <div class="flow-desc">Fires headless execution intent with microsecond SL / TP bounds (No private keys).</div>
+    </div>
+    <div class="arrow">➔</div>
+    <div class="flow-step">
+      <div class="flow-icon">⚡</div>
+      <div class="flow-title">2. ZeroDrain Sentinel</div>
+      <div class="flow-desc">3-second tick Mark-to-Market engine dynamically ratchets trailing profit floors.</div>
+    </div>
+    <div class="arrow">➔</div>
+    <div class="flow-step">
+      <div class="flow-icon">⛓️</div>
+      <div class="flow-title">3. Smart Contract Vault</div>
+      <div class="flow-desc">On circuit breaker or exit, capital is programmatically returned strictly to caller wallet.</div>
+    </div>
+  </div>
+
+  <div class="invariants">
+    <div class="inv-card">
+      <div class="inv-title">🔒 100% Non-Custodial</div>
+      <div class="inv-desc">ZeroDrain never asks for or stores private keys. Capital remains strictly in user custody.</div>
+    </div>
+    <div class="inv-card">
+      <div class="inv-title">📈 Trailing Profit Ratchet</div>
+      <div class="inv-desc">As trades move into profit, liquidation floor ratchets upwards, locking in gains.</div>
+    </div>
+    <div class="inv-card">
+      <div class="inv-title">📜 Verifiable On-Chain Receipts</div>
+      <div class="inv-desc">Settlements verified on NEAR blocks via FastNear RPC with public NearBlocks explorer links.</div>
+    </div>
+  </div>
+
+  <div class="footer">Smart Contract: zerodrain-relayer-vault.testnet • ZeroDrain AI Monorepo: 51/51 Tests Passed</div>
+</body>
+</html>
