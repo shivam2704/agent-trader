@@ -358,3 +358,18 @@ Open `http://localhost:5173` in your browser.
 2. **On-Chain Vault Enforcement:** The smart contract locks the caller's wallet upon order arming; settlement transactions are programmatically restricted to that exact account.
 3. **MEV-Resistant Intent Routing:** Off-chain solver auctions prevent mempool frontrunning, sandwiching, and predatory slippage.
 4. **Resilient Fail-Safe Circuit Breaker:** The 3-second continuous evaluation loop ensures orders are liquidated before catastrophic liquidation occurs.
+
+---
+
+## 🗺️ Production Roadmap
+
+- [ ] **Multi-Network Switching (`Mainnet` / `Testnet`):**
+  - Instant UI network toggle with automatic RPC switching between FastNear Testnet and Mainnet.
+  - Production deployment of audited ZeroDrain Relayer Vault on NEAR Mainnet (`zerodrain-vault.near`).
+- [ ] **Native NEAR Wallet Selector:**
+  - One-click browser wallet authentication (Meteor Wallet, HERE Wallet, Nightly, Sender) alongside existing headless AI agent intent payloads.
+- [ ] **Omnichain Intent Settlement via NEAR Chain Signatures:**
+  - Direct cross-chain scalping across Bitcoin, Solana, and Ethereum using NEAR MPC / Chain Signatures without wrapping or bridging friction.
+- [ ] **Adaptive AI Reinforcement Learning Agents:**
+  - Dynamic trailing stop-loss calibration auto-tuned to live order book imbalance and market volatility regimes.
+
