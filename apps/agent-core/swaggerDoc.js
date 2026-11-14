@@ -109,6 +109,18 @@ const swaggerSpec = {
                     default: 'TWO_WAY',
                     description: 'Trading strategy mode.',
                   },
+                  trailingStop: {
+                    type: 'boolean',
+                    default: false,
+                    description: 'Enables dynamic monotonic profit ratcheting to trail peak price and lock in gains.',
+                    example: true,
+                  },
+                  maxTrades: {
+                    type: 'integer',
+                    default: 1,
+                    description: 'Campaign trade execution limit (1 to 10 automated cycles).',
+                    example: 3,
+                  },
                   webhookUrl: {
                     type: 'string',
                     nullable: true,
@@ -298,7 +310,8 @@ const swaggerSpec = {
     '/api/market/history': {
       get: {
         tags: ['Market Data & Oracles'],
-        summary: 'Multi-Timeframe Candlestick & Tick History',
+        summary: 'Multi-Timeframe Candlestick & Tick History (Binance Vision)',
+        description: 'Fetches high-resolution OHLCV candlesticks directly from Binance Vision API (or organic synthesis for ecosystem tokens), including 24h high, low, volume, and swing percentage.',
         parameters: [
           {
             name: 'symbol',
@@ -310,12 +323,51 @@ const swaggerSpec = {
             name: 'timeframe',
             in: 'query',
             required: false,
-            schema: { type: 'string', enum: ['TICK', '1m', '5m', '15m'], default: '1m' },
+            schema: { type: 'string', enum: ['TICK', '1m', '5m', '15m', '1h', '1D'], default: '1m' },
           },
         ],
         responses: {
           200: {
-            description: 'Timeframe candle array.',
+            description: 'Timeframe candle array with 24h volume and swing stats.',
+          },
+        },
+      },
+    },
+    '/api/market/switch-token': {
+      post: {
+        tags: ['Market Data & Oracles'],
+        summary: 'Switch Active Market Tracking Token',
+        description: 'Switches the node active tracking token for real-time WebSocket feeds, chart klines, and order book depth.',
+        requestBody: {
+          required: true,
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                required: ['symbol'],
+                properties: {
+                  symbol: { type: 'string', example: 'ETH' },
+                  token: { type: 'string', example: 'weth.fakes.testnet' },
+                },
+              },
+            },
+          },
+        },
+        responses: {
+          200: {
+            description: 'Active tracking token updated.',
+          },
+        },
+      },
+    },
+    '/api/agent/reset-ledger': {
+      post: {
+        tags: ['Agent Trading'],
+        summary: 'Reset & Clear Ledger (Development / Clean Slate)',
+        description: 'Resets the persistent DB order ledger, clears active in-memory positions, and zeroes fee accumulators.',
+        responses: {
+          200: {
+            description: 'Ledger cleared successfully.',
           },
         },
       },
