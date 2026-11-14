@@ -265,6 +265,89 @@ function validateExitPayload(body) {
 }
 
 /**
+ * 2.5 Validate Intent Quote Payload (POST /api/intents/quote)
+ */
+function validateQuotePayload(body) {
+  if (!body || typeof body !== 'object' || Array.isArray(body)) {
+    throw new ApiGuardError(
+      400,
+      'INVALID_QUOTE_PAYLOAD',
+      'Request body must be a valid JSON object.',
+      null,
+      'Send { destinationToken: string, amount: number, wallet: string, originToken?: string }'
+    );
+  }
+
+  const { originToken, destinationToken, amount, wallet, slippageToleranceBps } = body;
+
+  if (!destinationToken || typeof destinationToken !== 'string' || !destinationToken.trim()) {
+    throw new ApiGuardError(
+      400,
+      'MISSING_DESTINATION_TOKEN',
+      'Target asset ("destinationToken") is strictly required (e.g. "USDC", "wrap.testnet", "sol.omft.near").',
+      'destinationToken',
+      'Provide destination token symbol or contract address'
+    );
+  }
+
+  if (!wallet || typeof wallet !== 'string' || !wallet.trim()) {
+    throw new ApiGuardError(
+      400,
+      'MISSING_WALLET',
+      'Caller wallet ("wallet") is required for solver intent execution and settlement.',
+      'wallet',
+      'Provide valid NEAR account ID, e.g. "caller.testnet"'
+    );
+  }
+
+  const cleanWallet = wallet.trim().toLowerCase();
+  if (!isValidNearAccountId(cleanWallet)) {
+    throw new ApiGuardError(
+      400,
+      'INVALID_WALLET_FORMAT',
+      `"${wallet}" is not a valid NEAR Protocol account ID.`,
+      'wallet',
+      'Ensure account ID is valid testnet account'
+    );
+  }
+
+  if (amount === undefined || amount === null) {
+    throw new ApiGuardError(
+      400,
+      'MISSING_AMOUNT',
+      'Amount ("amount") is required.',
+      'amount',
+      'Provide numeric amount e.g. 1.0'
+    );
+  }
+
+  const numAmount = parseFloat(amount);
+  if (isNaN(numAmount) || !isFinite(numAmount) || numAmount <= 0) {
+    throw new ApiGuardError(
+      400,
+      'INVALID_AMOUNT',
+      'Amount must be a positive number.',
+      'amount',
+      'Provide positive numeric amount (e.g. 1.0)'
+    );
+  }
+
+  const cleanOrigin = originToken && typeof originToken === 'string' && originToken.trim()
+    ? originToken.trim()
+    : 'wrap.testnet';
+
+  const numSlippage = slippageToleranceBps !== undefined ? parseInt(slippageToleranceBps) : 50;
+
+  return {
+    originToken: cleanOrigin,
+    destinationToken: destinationToken.trim(),
+    amount: numAmount,
+    wallet: cleanWallet,
+    slippageToleranceBps: isNaN(numSlippage) ? 50 : Math.min(1000, Math.max(1, numSlippage)),
+  };
+}
+
+/**
  * 3. Express Error Handling Middleware for Agent APIs
  * Formats all exceptions into structured, actionable JSON that AI Agents can parse
  */
@@ -308,5 +391,6 @@ module.exports = {
   isValidNearAccountId,
   validateTradePayload,
   validateExitPayload,
+  validateQuotePayload,
   globalAgentErrorHandler,
 };

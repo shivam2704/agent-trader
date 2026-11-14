@@ -534,7 +534,8 @@ class AgentBrain {
         }
 
         const pnlPercent = parseFloat(((priceDiff / pos.entryPrice) * 100).toFixed(2));
-        const pnlUsd = parseFloat((priceDiff * pos.sizeNear).toFixed(2));
+        const nearUsdPrice = this.getTokenCurrentPrice('wrap.testnet') || 3.30;
+        const pnlUsd = parseFloat(((pnlPercent / 100) * (pos.sizeNear * nearUsdPrice)).toFixed(4));
         pos.pnlPercent = pnlPercent;
         pos.pnlUsd = pnlUsd;
 
@@ -672,7 +673,7 @@ class AgentBrain {
 
     // Fee calculation
     const entryFeeNear = 0.0018 + (sizeNear * 0.0015);
-    const liveNearUsd = price || this.getTokenCurrentPrice('wrap.testnet') || marketEngine.currentPrice || 1.0;
+    const liveNearUsd = this.getTokenCurrentPrice('wrap.testnet') || 3.30;
     this.feeStats.totalFeesPaidNear = parseFloat((this.feeStats.totalFeesPaidNear + entryFeeNear).toFixed(4));
     this.feeStats.totalFeesPaidUsd = parseFloat((this.feeStats.totalFeesPaidNear * liveNearUsd).toFixed(4));
 
@@ -718,60 +719,59 @@ class AgentBrain {
 
     try {
       const exitFeeNear = 0.0018 + (targetPos.sizeNear * 0.0015);
-    const tokenLivePrice = targetPos.currentPrice || this.getTokenCurrentPrice(targetPos.token) || marketEngine.currentPrice || 1.0;
-    this.feeStats.totalFeesPaidNear = parseFloat((this.feeStats.totalFeesPaidNear + exitFeeNear).toFixed(4));
-    this.feeStats.totalFeesPaidUsd = parseFloat((this.feeStats.totalFeesPaidNear * tokenLivePrice).toFixed(4));
+      const liveNearUsd = this.getTokenCurrentPrice('wrap.testnet') || 3.30;
+      this.feeStats.totalFeesPaidNear = parseFloat((this.feeStats.totalFeesPaidNear + exitFeeNear).toFixed(4));
+      this.feeStats.totalFeesPaidUsd = parseFloat((this.feeStats.totalFeesPaidNear * liveNearUsd).toFixed(4));
 
-    // STRICT INVARIANT: Always return to the wallet that created the position
-    const returnWallet = targetPos.returnWallet.trim();
-    const currentPrice = tokenLivePrice;
+      // STRICT INVARIANT: Always return to the wallet that created the position
+      const returnWallet = targetPos.returnWallet.trim();
 
-    // Calculate returned amount in NEAR
-    const pnlNear = targetPos.pnlUsd / currentPrice;
-    const grossReturnNear = targetPos.sizeNear + pnlNear;
-    const finalSettledNear = Math.max(0.001, parseFloat((grossReturnNear - exitFeeNear).toFixed(4)));
+      // Calculate returned amount in NEAR based on realized PnL percentage
+      const pnlNear = (targetPos.pnlPercent / 100) * targetPos.sizeNear;
+      const grossReturnNear = targetPos.sizeNear + pnlNear;
+      const finalSettledNear = Math.max(0.001, parseFloat((grossReturnNear - exitFeeNear).toFixed(4)));
 
-    // Generate AI Agent Reasoning
-    const exitReasoning = this.generateReasoning(reason, {
-      token: targetPos.token,
-      tokenSymbol: targetPos.tokenSymbol,
-      pnlPercent: targetPos.pnlPercent,
-      sl: targetPos.sl,
-      tp: targetPos.tp,
-      returnWallet,
-      sizeNear: targetPos.sizeNear,
-    });
-
-    // Execute on-chain return to caller wallet strictly via Smart Contract Vault
-    const returnSettlement = await nearEngine.executeReturnToWallet({
-      toWallet: returnWallet,
-      amountNear: finalSettledNear,
-      tokenContract: targetPos.token,
-      txReason: reason,
-      orderId: targetPos.orderId || orderId,
-    });
-
-    if (returnSettlement && returnSettlement.isLiveOnChain) {
-      this.addLog(
-        'CIRCUIT_BREAKER',
-        `⛓️ SMART CONTRACT VAULT SETTLED [${orderId}]: Contract ${returnSettlement.contractId || nearEngine.vaultContractId} dispatched ${finalSettledNear} NEAR strictly to ${returnWallet}. Tx: ${returnSettlement.txHash}`
-      );
-    }
-
-    // Execute Defuse Protocol Return Intent Settlement
-    let defuseReceipt = null;
-    try {
-      const returnIntent = await nearIntentsEngine.generateIntentQuote({
-        originToken: targetPos.token || 'wrap.near',
-        destinationToken: 'wrap.near',
-        amount: finalSettledNear,
-        wallet: returnWallet,
+      // Generate AI Agent Reasoning
+      const exitReasoning = this.generateReasoning(reason, {
+        token: targetPos.token,
+        tokenSymbol: targetPos.tokenSymbol,
+        pnlPercent: targetPos.pnlPercent,
+        sl: targetPos.sl,
+        tp: targetPos.tp,
+        returnWallet,
+        sizeNear: targetPos.sizeNear,
       });
-      defuseReceipt = await nearIntentsEngine.executeIntentOrder(returnIntent);
-      returnSettlement.defuseReceipt = defuseReceipt;
-    } catch (e) {
-      console.warn('Defuse return intent note:', e.message);
-    }
+
+      // Execute on-chain return to caller wallet strictly via Smart Contract Vault
+      const returnSettlement = await nearEngine.executeReturnToWallet({
+        toWallet: returnWallet,
+        amountNear: finalSettledNear,
+        tokenContract: targetPos.token,
+        txReason: reason,
+        orderId: targetPos.orderId || orderId,
+      });
+
+      if (returnSettlement && returnSettlement.isLiveOnChain) {
+        this.addLog(
+          'CIRCUIT_BREAKER',
+          `⛓️ SMART CONTRACT VAULT SETTLED [${orderId}]: Contract ${returnSettlement.contractId || nearEngine.vaultContractId} dispatched ${finalSettledNear} NEAR strictly to ${returnWallet}. Tx: ${returnSettlement.txHash}`
+        );
+      }
+
+      // Execute Defuse Protocol Return Intent Settlement
+      let defuseReceipt = null;
+      try {
+        const returnIntent = await nearIntentsEngine.generateIntentQuote({
+          originToken: targetPos.token || 'wrap.testnet',
+          destinationToken: 'wrap.testnet',
+          amount: finalSettledNear,
+          wallet: returnWallet,
+        });
+        defuseReceipt = await nearIntentsEngine.executeIntentOrder(returnIntent);
+        returnSettlement.defuseReceipt = defuseReceipt;
+      } catch (e) {
+        console.warn('Defuse return intent note:', e.message);
+      }
 
     const tx = await nearEngine.executeTradeTransaction({
       accountId: returnWallet,

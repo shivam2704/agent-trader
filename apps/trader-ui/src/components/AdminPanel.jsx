@@ -95,14 +95,18 @@ export default function AdminPanel({
   };
 
   const handleFetchIntentQuote = async () => {
+    if (!wallet || !wallet.trim()) {
+      setResponseMsg({ success: false, text: 'Please enter a Caller Wallet address first to preview Intent quote.' });
+      return;
+    }
     setFetchingQuote(true);
     try {
       const res = await fetch('/api/intents/quote', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          originToken: 'wrap.near',
-          destinationToken: token.trim(),
+          originToken: 'wrap.testnet',
+          destinationToken: token.trim() || 'wrap.testnet',
           amount: parseFloat(amount) || 1.0,
           wallet: wallet.trim(),
         }),
@@ -110,6 +114,8 @@ export default function AdminPanel({
       const data = await res.json();
       if (data.success && data.quote) {
         setIntentPreview(data.quote);
+      } else if (data.error) {
+        setResponseMsg({ success: false, text: data.error });
       }
     } catch (e) {
       console.error('Quote fetch error:', e);

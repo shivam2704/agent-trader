@@ -12,7 +12,14 @@ const nearEngine = require('./nearEngine');
 const agentBrain = require('./agentBrain');
 const nearIntentsEngine = require('./nearIntentsEngine');
 const dbEngine = require('./dbEngine');
-const { validateTradePayload, validateExitPayload, globalAgentErrorHandler, ApiGuardError } = require('./apiGuard');
+const {
+  validateTradePayload,
+  validateExitPayload,
+  validateQuotePayload,
+  isValidNearAccountId,
+  globalAgentErrorHandler,
+  ApiGuardError,
+} = require('./apiGuard');
 const { swaggerSpec, renderSwaggerHtml } = require('./swaggerDoc');
 
 const path = require('path');
@@ -83,86 +90,153 @@ app.get('/api/market/history', (req, res) => {
 });
 
 // 2.2 Switch active chart tracking token
-app.post('/api/market/switch-token', async (req, res) => {
-  const { token, symbol } = req.body;
-  const trackingSym = symbol || (token ? token.split('.')[0].toUpperCase() : 'NEAR');
-  const targetContract = token || symbol || 'wrap.testnet';
-  
-  if (trackingSym) {
+app.post('/api/market/switch-token', async (req, res, next) => {
+  try {
+    const { token, symbol } = req.body || {};
+    if (!token && !symbol) {
+      throw new ApiGuardError(
+        400,
+        'MISSING_TOKEN_IDENTIFIER',
+        'Either "token" (contract address) or "symbol" (ticker) must be provided in request body.',
+        'token',
+        'Pass { token: "wrap.testnet", symbol: "NEAR" }'
+      );
+    }
+    const trackingSym = symbol ? symbol.toUpperCase() : (token ? token.split('.')[0].toUpperCase() : 'NEAR');
+    const targetContract = (token || symbol).trim();
+
     marketEngine.setTrackingSymbol(trackingSym);
+    agentBrain.config.tokenPair = targetContract;
+
+    const state = await marketEngine.updateMarketPrice();
+    agentBrain.broadcast();
+    res.json(state);
+  } catch (err) {
+    next(err);
   }
-  agentBrain.config.tokenPair = targetContract;
-  
-  const state = await marketEngine.updateMarketPrice();
-  agentBrain.broadcast();
-  res.json(state);
 });
 
 // 3. User NEAR Testnet Wallet details
-app.get('/api/wallet/:accountId', async (req, res) => {
-  const { accountId } = req.params;
-  const details = await nearEngine.getAccountDetails(accountId);
-  res.json(details);
+app.get('/api/wallet/:accountId', async (req, res, next) => {
+  try {
+    const { accountId } = req.params;
+    if (!isValidNearAccountId(accountId)) {
+      throw new ApiGuardError(
+        400,
+        'INVALID_ACCOUNT_ID',
+        `"${accountId}" is not a valid NEAR Protocol account ID.`,
+        'accountId',
+        'Account IDs must end in .testnet or .near, or be a 64-char hex key.'
+      );
+    }
+    const details = await nearEngine.getAccountDetails(accountId);
+    res.json(details);
+  } catch (err) {
+    next(err);
+  }
 });
 
 // 3.1 Create and fund real Testnet Account on NEAR
-app.post('/api/wallet/create-testnet-account', async (req, res) => {
-  const result = await nearEngine.createRealTestnetAccount();
-  if (result.success) {
-    agentBrain.updateConfig({ accountId: result.accountId });
+app.post('/api/wallet/create-testnet-account', async (req, res, next) => {
+  try {
+    const result = await nearEngine.createRealTestnetAccount();
+    if (result.success) {
+      agentBrain.updateConfig({ accountId: result.accountId });
+    }
+    res.json(result);
+  } catch (err) {
+    next(err);
   }
-  res.json(result);
 });
 
 // 3.2 Import Testnet Key directly for testing & autonomous signing
-app.post('/api/wallet/import-key', async (req, res) => {
-  const { accountId, privateKey } = req.body;
-  if (!accountId || !privateKey) {
-    return res.status(400).json({ success: false, error: 'accountId and privateKey are required' });
+app.post('/api/wallet/import-key', async (req, res, next) => {
+  try {
+    const { accountId, privateKey } = req.body || {};
+    if (!accountId || !isValidNearAccountId(accountId)) {
+      throw new ApiGuardError(
+        400,
+        'INVALID_ACCOUNT_ID',
+        'Valid NEAR accountId is required.',
+        'accountId',
+        'Provide valid testnet account ID (e.g. "my_bot.testnet")'
+      );
+    }
+    if (!privateKey || typeof privateKey !== 'string' || !privateKey.startsWith('ed25519:')) {
+      throw new ApiGuardError(
+        400,
+        'INVALID_PRIVATE_KEY',
+        'Private key must be a valid ED25519 key string starting with "ed25519:".',
+        'privateKey',
+        'Provide full private key formatted as "ed25519:..."'
+      );
+    }
+    const result = await nearEngine.importAccountPrivateKey(accountId, privateKey);
+    if (result.success) {
+      agentBrain.updateConfig({ accountId: result.accountId });
+    }
+    res.json(result);
+  } catch (err) {
+    next(err);
   }
-  const result = await nearEngine.importAccountPrivateKey(accountId, privateKey);
-  if (result.success) {
-    agentBrain.updateConfig({ accountId: result.accountId });
-  }
-  res.json(result);
 });
 
 // 3.5 Verify Token ID / NEP-141 contract on NEAR Testnet
-app.get('/api/token/verify', async (req, res) => {
-  const tokenId = req.query.tokenId || 'wrap.testnet';
-  const verification = await nearEngine.verifyTokenContract(tokenId);
-  res.json(verification);
-});
-
-// 3.6 NEAR Intents / 1-Click API (Defuse Protocol) Endpoints
-app.get('/api/intents/tokens', async (req, res) => {
-  const tokens = await nearIntentsEngine.getTokens();
-  res.json({ success: true, count: tokens.length, tokens });
-});
-
-app.post('/api/intents/quote', async (req, res) => {
+app.get('/api/token/verify', async (req, res, next) => {
   try {
-    const { originToken, destinationToken, amount, wallet, slippageToleranceBps } = req.body;
-    const quote = await nearIntentsEngine.generateIntentQuote({
-      originToken: originToken || 'wrap.testnet',
-      destinationToken: destinationToken || 'USDC',
-      amount: amount || 1.0,
-      wallet: (wallet || agentBrain.config.wallet || '').trim(),
-      slippageToleranceBps: slippageToleranceBps || 50,
-    });
-    res.json({ success: true, quote });
+    const tokenId = req.query.tokenId;
+    if (!tokenId || !tokenId.trim()) {
+      throw new ApiGuardError(
+        400,
+        'MISSING_TOKEN_ID',
+        'Query parameter "tokenId" is required.',
+        'tokenId',
+        'Pass ?tokenId=wrap.testnet or other NEP-141 contract ID'
+      );
+    }
+    const verification = await nearEngine.verifyTokenContract(tokenId.trim());
+    res.json(verification);
   } catch (err) {
-    res.status(400).json({ success: false, error: err.message });
+    next(err);
   }
 });
 
-app.post('/api/intents/execute', async (req, res) => {
+// 3.6 NEAR Intents / 1-Click API (Defuse Protocol) Endpoints
+app.get('/api/intents/tokens', async (req, res, next) => {
   try {
-    const { quote } = req.body;
+    const tokens = await nearIntentsEngine.getTokens();
+    res.json({ success: true, count: tokens.length, tokens });
+  } catch (err) {
+    next(err);
+  }
+});
+
+app.post('/api/intents/quote', async (req, res, next) => {
+  try {
+    const validated = validateQuotePayload(req.body);
+    const quote = await nearIntentsEngine.generateIntentQuote(validated);
+    res.json({ success: true, quote });
+  } catch (err) {
+    next(err);
+  }
+});
+
+app.post('/api/intents/execute', async (req, res, next) => {
+  try {
+    const { quote } = req.body || {};
+    if (!quote || typeof quote !== 'object' || !quote.quoteId) {
+      throw new ApiGuardError(
+        400,
+        'MISSING_INTENT_QUOTE',
+        'Valid solver quote object with "quoteId" is required to execute intent.',
+        'quote',
+        'First request a quote via POST /api/intents/quote and pass the returned quote object'
+      );
+    }
     const result = await nearIntentsEngine.executeIntentOrder(quote);
     res.json({ success: true, result });
   } catch (err) {
-    res.status(400).json({ success: false, error: err.message });
+    next(err);
   }
 });
 
