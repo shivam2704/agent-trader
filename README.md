@@ -212,7 +212,7 @@ ZeroDrain is not a walled garden or a rival DEX — it is the **Real-Time Runtim
 | **What It Prevents** | Unauthorized agent actions, rogue contract calls | Capital wipeout from market crashes, unhandled slippage shocks |
 | **Capital Safety** | Limits how much an agent can spend | Guarantees funds return on-chain to `return_wallet` on SL/TP |
 
-### 5. 🛑 Hard Stop-Loss Circuit Breaker ("Sb Khali Na Ho Jaye")
+### 5. 🛑 Hard Stop-Loss Circuit Breaker (Zero Capital Drain Guarantee)
 - Real-time mark-to-market position evaluation every 3 seconds.
 - Instant liquidation and return of remaining capital (~95%) upon Stop-Loss trigger.
 
@@ -339,7 +339,7 @@ ZeroDrain is pre-configured with a root [`render.yaml`](render.yaml) blueprint f
 ### 2. Install & Run
 ```bash
 # Clone the repository
-git clone <your-repo-url>
+git clone https://github.com/shivam2704/agent-trader.git
 cd agent-trader
 
 # Install monorepo dependencies
@@ -395,9 +395,9 @@ External AI agents interact through four decoupled communication modes:
 
 ## 🗺️ Production Roadmap
 
-- [ ] **Multi-Network Switching (`Mainnet` / `Testnet`):**
-  - Instant UI network toggle with automatic RPC switching between FastNear Testnet and Mainnet.
-  - Production deployment of audited ZeroDrain Relayer Vault on NEAR Mainnet (`zerodrain-vault.near`).
+- [x] **Multi-Network Switching (`Mainnet` / `Testnet`):**
+  - Instant UI network toggle with automatic FastNear Testnet and Mainnet RPC switching.
+  - Dynamic token contract resolution (`wrap.near` vs `wrap.testnet`, USDT, USDC) with Non-Custodial Safety Guard.
 - [ ] **Native NEAR Wallet Selector:**
   - One-click browser wallet authentication (Meteor Wallet, HERE Wallet, Nightly, Sender) alongside existing headless AI agent intent payloads.
 - [ ] **Omnichain Intent Settlement via NEAR Chain Signatures:**
