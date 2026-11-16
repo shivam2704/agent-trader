@@ -78,10 +78,22 @@ export default function LiveChart({
   const [searchQuery, setSearchQuery] = useState('');
   const [copiedContract, setCopiedContract] = useState(false);
   const [isPickerOpen, setIsPickerOpen] = useState(false);
+  const [tokensList, setTokensList] = useState([]);
+
+  useEffect(() => {
+    fetch('/api/market/tokens')
+      .then((r) => r.json())
+      .then((d) => {
+        if (d && Array.isArray(d.tokens)) {
+          setTokensList(d.tokens);
+        }
+      })
+      .catch(() => {});
+  }, []);
 
   const stats = marketData?.stats || {};
   const symbol = (marketData?.symbol || 'NEAR').toUpperCase();
-  const rawTokens = marketData?.supportedTokens || [];
+  const rawTokens = tokensList.length > 0 ? tokensList : (marketData?.supportedTokens || []);
   const matchedToken = rawTokens.find((t) => t.symbol === symbol);
   const price = marketData?.price || matchedToken?.currentPrice || matchedToken?.defaultPrice || 3.30;
 

@@ -519,7 +519,7 @@ class MarketEngine {
       },
       signal,
       reasoning,
-      supportedTokens: this.getAllSupportedTokens(),
+      supportedTokens: [],
       historyLength: history.length,
       recentPrices: history.slice(-25),
     };
