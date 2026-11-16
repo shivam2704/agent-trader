@@ -303,33 +303,6 @@ Returns `{ "status": "HEALTHY", "node": "ZeroDrain AI Core", "uptimeSeconds": 14
 
 ---
 
-## 🚀 Cloud Deployment: Render.com (1-Click Blueprint)
-
-ZeroDrain is pre-configured with a root [`render.yaml`](render.yaml) blueprint for instant zero-configuration deployment on Render.
-
-### Step-by-Step 1-Click Deployment:
-
-1. **Push your fork or repository to GitHub:**
-   ```bash
-   git add .
-   git commit -m "feat: ZeroDrain AI production deployment"
-   git push origin main
-   ```
-
-2. **Deploy on Render:**
-   - Log in to [Render.com](https://render.com).
-   - Click **"New +"** ➔ **"Blueprint"**.
-   - Connect your GitHub repository.
-   - Render automatically reads [`render.yaml`](render.yaml), pre-filling build commands, health checks (`/health`), and environment variables.
-
-3. **Provide Signing Key:**
-   - When prompted for `NEAR_RELAYER_PRIVATE_KEY`, enter your vault relayer private key (`ed25519:...`).
-   - Click **"Apply"** to launch the service.
-
-*(Alternative: Also supports [Railway.app](https://railway.app) via root `Dockerfile` and `railway.json`).*
-
----
-
 ## 💻 Local Development
 
 ### 1. Prerequisites
