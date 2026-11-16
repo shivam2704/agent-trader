@@ -5,8 +5,8 @@
 
 - **🏆 Hackathon Tracks:** `Agent Economy` • `Unstoppable DeFi` • `AI Security & Defense`
 - **🌐 Network:** NEAR Testnet (Live Verified On-Chain) + FastNear Mainnet Switcher
-- **⚡ Live Terminal & Node:** [https://zerodrain-agent-trader.onrender.com/](https://zerodrain-agent-trader.onrender.com/)
-- **📚 Interactive Swagger / OpenAPI 3.0:** [https://zerodrain-agent-trader.onrender.com/docs](https://zerodrain-agent-trader.onrender.com/docs)
+- **⚡ Live Terminal & Node:** [https://zerodrain-agent-trader-odjb.onrender.com/](https://zerodrain-agent-trader-odjb.onrender.com/)
+- **📚 Interactive Swagger / OpenAPI 3.0:** [https://zerodrain-agent-trader-odjb.onrender.com/docs](https://zerodrain-agent-trader-odjb.onrender.com/docs)
 - **⛓️ Smart Contract Vault:** [`zerodrain-relayer-vault.testnet`](https://testnet.nearblocks.io/address/zerodrain-relayer-vault.testnet)
 - **🧪 Automated Verification Suite:** `npm test` *(51/51 assertions passing across 15 suites)*
 
@@ -27,7 +27,7 @@
 You can leverage ZeroDrain in **three distinct ways** depending on your workflow:
 
 ### Mode 1: Interactive Cyber-Terminal (Zero-Code Visual Dashboard)
-1. Open the live terminal: **[https://zerodrain-agent-trader.onrender.com/](https://zerodrain-agent-trader.onrender.com/)**
+1. Open the live terminal: **[https://zerodrain-agent-trader-odjb.onrender.com/](https://zerodrain-agent-trader-odjb.onrender.com/)**
 2. In the **Intent Gateway** panel on the left:
    - Enter your NEAR account (e.g. `yourname.testnet`).
    - Set **Allocation** (e.g. `0.5 NEAR`), **Stop-Loss** (e.g. `5%`), and **Take-Profit** (e.g. `10%`).
@@ -45,7 +45,7 @@ AI agents do not have human hands or browser extensions. They connect directly v
 
 ```bash
 # 1. Open a protected position from any agent
-curl -X POST https://zerodrain-agent-trader.onrender.com/api/agent/trade \
+curl -X POST https://zerodrain-agent-trader-odjb.onrender.com/api/agent/trade \
   -H "Content-Type: application/json" \
   -d '{
     "wallet": "your_agent_wallet.testnet",
@@ -58,16 +58,16 @@ curl -X POST https://zerodrain-agent-trader.onrender.com/api/agent/trade \
   }'
 
 # 2. Query your live open positions
-curl "https://zerodrain-agent-trader.onrender.com/api/agent/orders?wallet=your_agent_wallet.testnet"
+curl "https://zerodrain-agent-trader-odjb.onrender.com/api/agent/orders?wallet=your_agent_wallet.testnet"
 
 # 3. Query audited settlement receipts & on-chain tx hashes
-curl "https://zerodrain-agent-trader.onrender.com/api/agent/settlements?wallet=your_agent_wallet.testnet"
+curl "https://zerodrain-agent-trader-odjb.onrender.com/api/agent/settlements?wallet=your_agent_wallet.testnet"
 ```
 
 ---
 
 ### Mode 3: Interactive Swagger API Playground
-- Open **[https://zerodrain-agent-trader.onrender.com/docs](https://zerodrain-agent-trader.onrender.com/docs)**
+- Open **[https://zerodrain-agent-trader-odjb.onrender.com/docs](https://zerodrain-agent-trader-odjb.onrender.com/docs)**
 - Inspect complete OpenAPI 3.0 schemas, test trade entries, exit positions, and switch active tracking tokens with 1-click **"Try it out"**.
 
 ---
@@ -79,7 +79,7 @@ Claude Code & Codex screen projects to ensure they build, run, and fulfill their
 | Evaluation Pillar | How ZeroDrain Implements & Solves It | Verification Proof |
 | :--- | :--- | :--- |
 | **1. Technical Implementation** | • On-chain Smart Contract Vault on NEAR Testnet locking return destination.<br>• Defuse Protocol 1-Click Swap solver auction integration.<br>• Real-time mark-to-market WebSocket oracles & 3s circuit breaker loop.<br>• Strict API Guard validation preventing unhandled crashes. | Run `npm test` & inspect [`apps/agent-core/agentBrain.js`](file:///Users/shivam.sharma1/Documents/myProject/near/agent-trader/apps/agent-core/agentBrain.js). On-chain txs visible on [NearBlocks](https://testnet.nearblocks.io/address/zerodrain-relayer-vault.testnet). |
-| **2. Design & UX** | • Ultra-fast, high-density cyber-trading terminal with dark/light themes.<br>• Real-time candlestick charts (TICK, 1m, 5m, 15m), live order book, node terminal logs.<br>• Active orders table with live PnL & localized timezone timestamps.<br>• Settled Position Ledger with cryptographic on-chain explorer receipts. | Open live app: [https://zerodrain-agent-trader.onrender.com/](https://zerodrain-agent-trader.onrender.com/) |
+| **2. Design & UX** | • Ultra-fast, high-density cyber-trading terminal with dark/light themes.<br>• Real-time candlestick charts (TICK, 1m, 5m, 15m), live order book, node terminal logs.<br>• Active orders table with live PnL & localized timezone timestamps.<br>• Settled Position Ledger with cryptographic on-chain explorer receipts. | Open live app: [https://zerodrain-agent-trader-odjb.onrender.com/](https://zerodrain-agent-trader-odjb.onrender.com/) |
 | **3. Impact** | • Solves the #1 blocker for Autonomous AI Agents in DeFi: **Fear of Capital Drain** (runaway bots, cascading liquidation, and predatory MEV).<br>• Guaranteed capital recovery: On SL/TP breach, capital and profit are remitted directly to the caller's wallet on-chain. | Tested with real live testnet transactions and Defuse solver quotes. |
 | **4. Originality** | • First **Autonomous Post-Trade Risk Sentinel** for the NEAR Intents ecosystem.<br>• While standard NEAR Intents handle pre-trade static permissions (allowance/keys), ZeroDrain dynamically protects capital post-trade 24/7. | See Architecture Section 4: NEAR Intents Permissioning + ZeroDrain Sentinel. |
 | **5. Sustainability** | • Production-grade monorepo (`@zerodrain/agent-core` + `@zerodrain/trader-ui`).<br>• Full OpenAPI 3.0 specification (`/openapi.json` & `/docs`).<br>• 100% headless agent-to-agent integration via simple JSON curl payloads. | Zero human wallet popups needed; automated bots interact via standard REST & WebSocket. |
