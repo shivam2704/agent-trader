@@ -303,42 +303,30 @@ Returns `{ "status": "HEALTHY", "node": "ZeroDrain AI Core", "uptimeSeconds": 14
 
 ---
 
-## 🚀 Cloud Deployment: Railway.app (Recommended)
+## 🚀 Cloud Deployment: Render.com (1-Click Blueprint)
 
-Railway does not put free services to sleep after 15 minutes of inactivity, ensuring the 24/7 background Stop-Loss circuit breaker loop stays online continuously.
+ZeroDrain is pre-configured with a root [`render.yaml`](render.yaml) blueprint for instant zero-configuration deployment on Render.
 
-### Step-by-Step Railway Deployment:
+### Step-by-Step 1-Click Deployment:
 
-1. **Push this repository to GitHub:**
+1. **Push your fork or repository to GitHub:**
    ```bash
    git add .
    git commit -m "feat: ZeroDrain AI production deployment"
    git push origin main
    ```
 
-2. **Deploy on Railway:**
-   - Log in to [Railway.app](https://railway.app).
-   - Click **"New Project"** ➔ **"Deploy from GitHub repo"**.
-   - Select your repository.
-   - Railway will auto-detect [`railway.json`](file:///Users/shivam.sharma1/Documents/myProject/near/agent-trader/railway.json) & [`Dockerfile`](file:///Users/shivam.sharma1/Documents/myProject/near/agent-trader/Dockerfile) and begin the container build.
+2. **Deploy on Render:**
+   - Log in to [Render.com](https://render.com).
+   - Click **"New +"** ➔ **"Blueprint"**.
+   - Connect your GitHub repository.
+   - Render automatically reads [`render.yaml`](render.yaml), pre-filling build commands, health checks (`/health`), and environment variables.
 
-3. **Set Environment Variables in Railway:**
-   In your Railway project, navigate to **Variables** and add:
+3. **Provide Signing Key:**
+   - When prompted for `NEAR_RELAYER_PRIVATE_KEY`, enter your vault relayer private key (`ed25519:...`).
+   - Click **"Apply"** to launch the service.
 
-   | Variable | Value | Description |
-   |---|---|---|
-   | `PORT` | `4000` | Service listening port |
-   | `NODE_ENV` | `production` | Production environment flag |
-   | `NEAR_NETWORK_ID` | `testnet` | NEAR network (`testnet` or `mainnet`) |
-   | `NEAR_NODE_URL` | `https://test.rpc.fastnear.com` | High-speed NEAR RPC endpoint |
-   | `NEAR_RELAYER_ACCOUNT_ID` | `zerodrain-relayer-vault.testnet` | Deployed vault smart contract account |
-   | `NEAR_RELAYER_PRIVATE_KEY` | `ed25519:E8xHw2...` | Relayer signer key for vault settlements |
-   | `DEFUSE_API_URL` | `https://1click.chaindefuser.com` | Defuse Protocol 1-Click Solver Bus |
-
-4. **Generate Public Domain:**
-   - Go to **Settings** ➔ **Public Networking**.
-   - Click **"Generate Domain"**.
-   - Your unified live trading node & visual dashboard is accessible immediately at `https://your-app.up.railway.app`.
+*(Alternative: Also supports [Railway.app](https://railway.app) via root `Dockerfile` and `railway.json`).*
 
 ---
 
